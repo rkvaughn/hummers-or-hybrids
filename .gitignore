@@ -1,0 +1,29 @@
+# Raw data (large files, re-downloadable via scripts)
+data/raw/
+
+# Generated outputs (reproducible from scripts)
+data/processed/
+
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Editor
+.vscode/
+.idea/
+
+# Output (generated figures and tables — large, reproducible)
+output/figures/
+output/tables/
