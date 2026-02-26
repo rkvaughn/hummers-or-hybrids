@@ -5,7 +5,13 @@ Event study: Has climate ideology's relationship with Tesla adoption changed
 following Elon Musk's political pivot?
 
 Specification (within-tract demeaned to absorb tract FE):
-  dm(log_EV_it) = Σ_τ β_τ * dm(ideology_i × 1[year=τ]) + C(year) + ε_it
+  dm(log_EV_it) = Σ_τ β_τ * dm(ideology_i × 1[year=τ]) + X_it·δ + C(year) + ε_it
+
+ACS controls (X_it): log_median_hh_income, pct_ba_plus, pop_density, pct_white, pct_wfh
+These controls are time-invariant (2023 ACS vintage applied to all years). Within-tract
+demeaning of a time-invariant variable produces a column of zeros, so they do not
+contribute to the within estimator — but are included for specification consistency
+with script 08.
 
 Run separately for:
   - Tesla BEVs (main series)
@@ -45,6 +51,8 @@ EVENTS = {
     2024: "DOGE / Trump admin\n(Nov 2024)",
 }
 
+CONTROLS = ["log_median_hh_income", "pct_ba_plus", "pop_density", "pct_white", "pct_wfh"]
+
 
 def load_panel() -> pd.DataFrame:
     panel = pd.read_csv(PROCESSED / "panel_tract_year.csv", dtype={"tract_geoid_20": str})
@@ -78,23 +86,46 @@ def run_event_study(df: pd.DataFrame, dv_col: str, series_label: str) -> pd.Data
     years = sorted(df["data_year"].unique())
     non_base = [y for y in years if y != BASE_YEAR]
 
-    sub = df[["tract_geoid_20", "data_year", dv_col, "climate_ideology_index"]].dropna().copy()
+    sub = df[["tract_geoid_20", "data_year", dv_col, "climate_ideology_index"] + CONTROLS].dropna().copy()
+
+    # Panel balance check — within-tract demeaning is unbiased only for balanced panels
+    year_counts = sub.groupby("tract_geoid_20")["data_year"].count()
+    n_years = sub["data_year"].nunique()
+    n_unbalanced = (year_counts != n_years).sum()
+    if n_unbalanced > 0:
+        pct = 100 * n_unbalanced / len(year_counts)
+        print(f"    WARNING: {n_unbalanced:,} tracts ({pct:.1f}%) have fewer than {n_years} observations (unbalanced)")
+        print(f"    Restricting to balanced panel (tracts with all {n_years} years)...")
+        balanced_tracts = year_counts[year_counts == n_years].index
+        sub = sub[sub["tract_geoid_20"].isin(balanced_tracts)].copy()
+        print(f"    Balanced panel: {len(sub):,} obs, {sub['tract_geoid_20'].nunique():,} tracts")
+    else:
+        print(f"    Panel is balanced ({n_years} years per tract).")
 
     # Create ideology × year interaction dummies
     for yr in non_base:
         sub[f"ideo_x_{yr}"] = sub["climate_ideology_index"] * (sub["data_year"] == yr).astype(float)
 
     inter_cols = [f"ideo_x_{yr}" for yr in non_base]
-    all_cols   = [dv_col, "climate_ideology_index"] + inter_cols
+    all_cols   = [dv_col, "climate_ideology_index"] + inter_cols + CONTROLS
 
     # Within-tract demean all variables
+    # Note: CONTROLS are time-invariant (2023 ACS vintage); after demeaning they will be
+    # all zeros (or near-zero floating-point noise). They contribute nothing to the within
+    # estimator but are included for specification consistency with script 08.
     tract_means = sub.groupby("tract_geoid_20")[all_cols].transform("mean")
     sub_dm = sub.copy()
     for col in all_cols:
         sub_dm[f"dm_{col}"] = sub[col] - tract_means[col]
 
+    # Verify time-invariant controls demean to (near) zero
+    ctrl_max_var = max(sub_dm[f"dm_{c}"].var() for c in CONTROLS)
+    print(f"    NOTE: ACS controls are time-invariant; max within-tract variance after "
+          f"demeaning = {ctrl_max_var:.2e} (expected ~0). Included for spec consistency with 08.")
+
     dm_inter_str = " + ".join(f"dm_ideo_x_{yr}" for yr in non_base)
-    formula = f"dm_{dv_col} ~ {dm_inter_str} + C(data_year) - 1"
+    dm_ctrl_str  = " + ".join(f"dm_{c}" for c in CONTROLS)
+    formula = f"dm_{dv_col} ~ {dm_inter_str} + {dm_ctrl_str} + C(data_year) - 1"
 
     print(f"    N obs = {len(sub_dm):,}, N tracts = {sub_dm['tract_geoid_20'].nunique():,}")
     print(f"    Fitting within-estimator (demeaned)...")
@@ -157,11 +188,13 @@ def plot_event_study(series_list: list[tuple], filename: str, title: str, captio
     # Baseline
     ax.axhline(0, color="black", lw=0.8, linestyle="--", alpha=0.5)
 
-    # Event markers
-    _, ymax = ax.get_ylim()
+    # Event markers — use get_xaxis_transform() so x is in data coordinates (pinned to
+    # event year) and y is in axes fraction (0–1), keeping labels in bounds regardless
+    # of data scale. Do NOT use ax.get_ylim() here as limits may not be finalized yet.
     for event_yr, event_label in EVENTS.items():
         ax.axvline(event_yr, color="#6b7280", lw=1.2, linestyle=":", alpha=0.8, zorder=1)
-        ax.text(event_yr + 0.06, ymax * 0.88, event_label,
+        ax.text(event_yr + 0.06, 0.88, event_label,
+                transform=ax.get_xaxis_transform(),  # x in data coords, y in axes coords (0-1)
                 fontsize=8, color="#374151", ha="left", va="top",
                 bbox=dict(boxstyle="round,pad=0.2", facecolor="white", alpha=0.7))
 
