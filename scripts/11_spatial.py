@@ -271,7 +271,8 @@ def run_sar(cs: pd.DataFrame, dv_col: str, model_label: str,
         }
 
     rho     = sar.rho
-    rho_se  = np.sqrt(sar.vm[0, 0]) if sar.vm is not None else np.nan
+    # vm ordering: [const, x1, ..., xk, rho] — rho is the LAST parameter
+    rho_se  = np.sqrt(sar.vm[-1, -1]) if sar.vm is not None else np.nan
     rho_z   = rho / rho_se if rho_se and not np.isnan(rho_se) else np.nan
     rho_p   = 2 * (1 - _norm_cdf(abs(rho_z))) if not np.isnan(rho_z) else np.nan
 
@@ -518,9 +519,11 @@ def main():
         ols_result, resid = run_ols(cs, dv_col)
         ols_results[dv_col] = (ols_result, resid, dv_label)
 
-        # Replace NaN residuals with 0 for Moran's I (these correspond to
-        # island tracts; treating as 0 is conservative but avoids crashing)
-        resid_clean = np.where(np.isfinite(resid), resid, 0.0)
+        n_nan_resid = np.sum(~np.isfinite(resid))
+        if n_nan_resid > 0:
+            print(f"  WARNING: {n_nan_resid} non-finite residuals for {dv_label} — "
+                  f"Moran's I will be unreliable. Check load_cross_section() filtering.")
+        resid_clean = resid  # No imputation — cross-section was pre-filtered to complete cases
 
         row = run_morans_i(resid_clean, w, dv_label)
         moran_rows.append(row)
@@ -537,7 +540,7 @@ def main():
         print("\nStep 5: Significant spatial autocorrelation detected — "
               "running SAR (Spatial Lag) models...")
         for dv_col, dv_label, dv_short in MODELS:
-            moran_sig = next(
+            moran_sig = any(
                 r["Significant_p05"].startswith("YES")
                 for r in moran_rows if r["Model"] == dv_label
             )
