@@ -1,3 +1,4 @@
+# core data
 certifi==2026.1.4
 charset-normalizer==3.4.4
 et_xmlfile==2.0.0
@@ -14,3 +15,27 @@ requests==2.32.5
 shapely==2.1.2
 six==1.17.0
 urllib3==2.6.3
+
+# analysis
+statsmodels>=0.14.0
+linearmodels>=6.0
+scikit-learn>=1.4.0
+scipy>=1.13.0
+
+# spatial
+pysal>=23.7
+libpysal>=4.10.0
+spreg>=1.4.0
+esda>=2.6.0
+
+# visualization
+matplotlib>=3.9.0
+seaborn>=0.13.0
+
+# scraping / html parsing
+beautifulsoup4>=4.12.0
+lxml>=5.2.0
+
+# tables
+tabulate>=0.9.0
+jinja2>=3.1.0
