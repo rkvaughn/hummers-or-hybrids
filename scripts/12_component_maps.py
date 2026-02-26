@@ -106,34 +106,41 @@ COMPONENTS = [
 
 def load_county_ideology() -> pd.DataFrame:
     """
-    Load ideology_tract.parquet; drop duplicates to get one row per county.
-    All ideology columns are county-level constants (assigned uniformly to tracts).
+    Load raw ideology component values from the master panel; drop duplicates to
+    get one row per county. All ideology columns are county-level constants
+    (assigned uniformly to tracts in 05_build_panel.py).
     Returns a DataFrame indexed by county_fips (first 5 chars of tract GEOID).
-    """
-    ideo_path = PROC / "ideology_tract.parquet"
-    if not ideo_path.exists():
-        raise FileNotFoundError(
-            f"ideology_tract.parquet not found at {ideo_path}.\n"
-            "Run scripts/06_ideology_index.py first."
-        )
 
-    df = pd.read_parquet(ideo_path)
-    print(f"  Loaded ideology_tract.parquet: {len(df):,} tract rows")
+    Source priority:
+        1. data/processed/panel_tract_year.csv  (preferred — has raw component values)
+        2. data/processed/ideology_tract.parquet (legacy name, if present)
+    """
+    panel_path  = PROC / "panel_tract_year.csv"
+    parquet_path = PROC / "ideology_tract.parquet"
+
+    if panel_path.exists():
+        df = pd.read_csv(panel_path, dtype={"tract_geoid_20": str}, low_memory=False)
+        print(f"  Loaded panel_tract_year.csv: {len(df):,} rows")
+    elif parquet_path.exists():
+        df = pd.read_parquet(parquet_path)
+        print(f"  Loaded ideology_tract.parquet: {len(df):,} rows")
+    else:
+        raise FileNotFoundError(
+            f"No ideology source found. Expected one of:\n"
+            f"  {panel_path}\n  {parquet_path}\n"
+            "Run scripts/05_build_panel.py then 06_ideology_index.py first."
+        )
 
     # Derive county_fips from tract GEOID (first 5 chars)
     geoid_col = next(
-        (c for c in df.columns if c.lower() in ("geoid", "tract_geoid_20", "tract_geoid")),
+        (c for c in df.columns
+         if c.lower() in ("geoid", "tract_geoid_20", "tract_geoid", "tract_geoid20")),
         None,
     )
     if geoid_col is None:
-        # Fall back: use index if it looks like a GEOID
-        if str(df.index[0]).startswith("06") and len(str(df.index[0])) == 11:
-            df = df.reset_index().rename(columns={"index": "geoid"})
-            geoid_col = "geoid"
-        else:
-            raise KeyError(
-                f"Cannot find GEOID column. Available columns: {list(df.columns)}"
-            )
+        raise KeyError(
+            f"Cannot find GEOID column. Available columns: {list(df.columns)}"
+        )
 
     df["county_fips"] = df[geoid_col].astype(str).str[:5]
 
