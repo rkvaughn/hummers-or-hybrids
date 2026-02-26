@@ -82,7 +82,7 @@ def run_year_fe(df: pd.DataFrame) -> dict:
                    f"+ C(data_year)")
         sub = df.dropna(subset=[dv_col] + CONTROL_COLS + ["climate_ideology_index"]).copy()
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+            warnings.filterwarnings("ignore", category=FutureWarning)
             res = smf.ols(formula, data=sub).fit(
                 cov_type="cluster",
                 cov_kwds={"groups": sub["tract_geoid_20"]}
