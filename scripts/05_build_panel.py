@@ -38,10 +38,17 @@ def weighted_sum_to_tract(df_unit: pd.DataFrame, unit_col: str,
     Distributes value_cols across overlapping tracts using weight column.
     Returns DataFrame with columns [tract_geoid_20] + value_cols aggregated by tract.
     """
+    n_units_before = df_unit[unit_col].nunique()
     merged = df_unit.merge(
         xwalk[[xwalk_unit_col, "tract_geoid_20", "weight"]],
-        left_on=unit_col, right_on=xwalk_unit_col, how="inner"
+        left_on=unit_col, right_on=xwalk_unit_col, how="left"
     )
+    unmatched = merged[merged["weight"].isna()][unit_col].nunique()
+    if unmatched > 0:
+        pct = unmatched / n_units_before * 100
+        print(f"    WARNING: {unmatched}/{n_units_before} ({pct:.1f}%) {unit_col} values "
+              f"had no crosswalk match and will be excluded")
+    merged = merged[merged["weight"].notna()]
     for col in value_cols:
         merged[col] = merged[col] * merged["weight"]
     return (
@@ -117,6 +124,11 @@ def build_ycom_tract() -> pd.DataFrame:
 
     tract_ycom = xwalk.merge(ycom, on="county_fips", how="left")
     rename = {c: f"ycom_{c}" for c in ycom_cols}
+    ycom_null_rate = tract_ycom[list(rename.keys())].isnull().mean().mean() * 100
+    if ycom_null_rate > 1:
+        print(f"    WARNING: YCOM null rate after county merge: {ycom_null_rate:.1f}% — check county_fips format")
+    else:
+        print(f"    YCOM null rate: {ycom_null_rate:.1f}% (expected 0)")
     tract_ycom = tract_ycom.rename(columns=rename)[["tract_geoid_20"] + list(rename.values())]
     print(f"    YCOM tract table: {len(tract_ycom):,} rows")
     return tract_ycom
@@ -198,8 +210,6 @@ def build_ballot_tract() -> pd.DataFrame:
             print(f"    WARNING: {yes_col}/{no_col} not found. Prop cols: {prop_cols[:20]}")
             continue
 
-        df["yes_share"] = _extract_prop_share(df, actual_yes, actual_no)
-
         xwalk = pd.read_csv(xwalk_path, dtype={"pctkey": str, "tract_geoid_20": str})
         key_candidates = ["PCTKEY", "PCTFIPS", "PCT_KEY", "PREC_KEY", "MPREC_KEY"]
         pct_col = next((c for c in df.columns if c in key_candidates), None)
@@ -207,12 +217,24 @@ def build_ballot_tract() -> pd.DataFrame:
             print(f"    WARNING: no precinct key found in {fname}")
             continue
 
-        df = df.rename(columns={pct_col: "pctkey"})
+        df[actual_yes] = pd.to_numeric(df[actual_yes], errors="coerce").fillna(0)
+        df[actual_no] = pd.to_numeric(df[actual_no], errors="coerce").fillna(0)
+        df["_total_votes"] = df[actual_yes] + df[actual_no]
+        df = df.rename(columns={pct_col: "pctkey"}) if pct_col != "pctkey" else df
         df["pctkey"] = df["pctkey"].astype(str)
-        merged = df[["pctkey", "yes_share"]].merge(xwalk, on="pctkey", how="inner")
-        merged["yes_share"] = merged["yes_share"] * merged["weight"]
-        tract_ballot = merged.groupby("tract_geoid_20")["yes_share"].sum().reset_index()
-        tract_ballot = tract_ballot.rename(columns={"yes_share": out_col})
+
+        keep_cols = ["pctkey", actual_yes, "_total_votes"]
+        merged = df[keep_cols].merge(xwalk, on="pctkey", how="left")
+        unmatched = merged["weight"].isna().sum()
+        if unmatched > 0:
+            print(f"    WARNING: {unmatched} precinct rows had no crosswalk match ({out_col})")
+        merged = merged[merged["weight"].notna()]
+        merged[actual_yes] = merged[actual_yes] * merged["weight"]
+        merged["_total_votes"] = merged["_total_votes"] * merged["weight"]
+
+        tract_ballot = merged.groupby("tract_geoid_20")[[actual_yes, "_total_votes"]].sum().reset_index()
+        tract_ballot[out_col] = tract_ballot[actual_yes] / tract_ballot["_total_votes"].replace(0, float("nan"))
+        tract_ballot = tract_ballot[["tract_geoid_20", out_col]]
         results[out_col] = tract_ballot
         print(f"    {out_col}: {len(tract_ballot):,} tracts")
 
@@ -226,7 +248,6 @@ def build_ballot_tract() -> pd.DataFrame:
 
 def build_acs_tract() -> pd.DataFrame:
     print("  [5] Loading ACS demographics...")
-    import math
     acs = pd.read_csv(RAW / "acs" / "acs_tracts_ca_clean.csv", dtype={"geoid": str})
 
     acs["pct_ba_plus"] = acs["pop_ba_degree"] / acs["pop_25plus"].replace(0, np.nan)
@@ -238,7 +259,7 @@ def build_acs_tract() -> pd.DataFrame:
     acs["pct_drove_alone"] = acs["workers_drove_alone"] / acs["workers_total"].replace(0, np.nan)
     acs["pct_wfh"] = acs["workers_wfh"] / acs["workers_total"].replace(0, np.nan)
     acs["log_median_hh_income"] = acs["median_hh_income"].apply(
-        lambda x: np.nan if pd.isna(x) or x <= 0 else math.log(x)
+        lambda x: np.nan if pd.isna(x) or x <= 0 else np.log(x)
     )
     # Population density: use total_pop as proxy (land area not in API response)
     # A rough density can be computed if shapefile area is available; placeholder here
