@@ -28,7 +28,6 @@ import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
@@ -159,7 +158,7 @@ def plot_event_study(series_list: list[tuple], filename: str, title: str, captio
     ax.axhline(0, color="black", lw=0.8, linestyle="--", alpha=0.5)
 
     # Event markers
-    ymin, ymax = ax.get_ylim()
+    _, ymax = ax.get_ylim()
     for event_yr, event_label in EVENTS.items():
         ax.axvline(event_yr, color="#6b7280", lw=1.2, linestyle=":", alpha=0.8, zorder=1)
         ax.text(event_yr + 0.06, ymax * 0.88, event_label,
