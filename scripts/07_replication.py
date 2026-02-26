@@ -19,13 +19,14 @@ Outputs:
   output/figures/replication_scatter.png
 """
 
-import math
 import warnings
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import patsy
+import statsmodels.discrete.discrete_model as discrete_models
 import statsmodels.formula.api as smf
 
 ROOT = Path(__file__).parent.parent
@@ -49,6 +50,10 @@ def load_cross_section() -> pd.DataFrame:
     cs = panel[panel["data_year"] == 2023].copy()
     cs = cs.merge(index[["tract_geoid_20", "climate_ideology_index"]],
                   on="tract_geoid_20", how="left")
+
+    n_missing = cs["climate_ideology_index"].isna().sum()
+    if n_missing > 0:
+        print(f"  WARNING: {n_missing} tracts missing ideology index after merge")
 
     required = (["climate_ideology_index", "pct_transit", "pct_drove_alone",
                  "total_bev", "total_light"] + CONTROL_COLS)
@@ -88,14 +93,14 @@ def _result_to_df(result, model_type: str = "ols") -> pd.DataFrame:
 
 
 def _save_table(df_table: pd.DataFrame, result, title: str, fname: str,
-                notes: str = ""):
+                notes: str = "", se_note: str = "HC3 robust SEs"):
     """Save regression table as CSV and HTML."""
     df_table.to_csv(TABLES / f"{fname}.csv", index=False)
     n = int(result.nobs)
     r2_str = f" | R²={result.rsquared:.3f}" if hasattr(result, "rsquared") else ""
     ll_str = f" | Log-L={result.llf:.1f}" if hasattr(result, "llf") else ""
     footer = (f"<p>N={n:,}{r2_str}{ll_str}<br>"
-              f"*p&lt;0.1, **p&lt;0.05, ***p&lt;0.01 (HC3 robust SEs). {notes}</p>")
+              f"*p&lt;0.1, **p&lt;0.05, ***p&lt;0.01 ({se_note}). {notes}</p>")
     html = f"<h3>{title}</h3>" + df_table.to_html(index=False) + footer
     with open(TABLES / f"{fname}.html", "w") as f:
         f.write(html)
@@ -137,12 +142,24 @@ def run_negbin_bev(cs: pd.DataFrame):
     cs = cs.copy()
     cs["total_bev_int"] = cs["total_bev"].round().astype(int)
     cs["log_total_light"] = np.log(cs["total_light"].clip(lower=1))
-    formula = f"total_bev_int ~ climate_ideology_index + {CONTROLS} + offset(log_total_light)"
+
+    # offset() is not a patsy builtin; use the array-based API with offset= argument
+    y_nb, X_nb = patsy.dmatrices(
+        f"total_bev_int ~ climate_ideology_index + {CONTROLS}",
+        data=cs, return_type="dataframe"
+    )
+    nb_model = discrete_models.NegativeBinomial(
+        y_nb, X_nb,
+        offset=cs.loc[y_nb.index, "log_total_light"].values
+    )
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        result = smf.negativebinomial(formula, data=cs).fit(disp=False, maxiter=200)
+        result = nb_model.fit(disp=False, maxiter=200)
+    if not result.mle_retvals.get("converged", True):
+        print("    WARNING: NegativeBinomial did not converge")
+
     coef = result.params["climate_ideology_index"]
-    irr = math.exp(coef)
+    irr = np.exp(coef)
     pval = result.pvalues["climate_ideology_index"]
     print(f"    ideology coef (log-rate) = {coef:.4f}, IRR = {irr:.4f} (p={pval:.3f})")
 
@@ -152,7 +169,7 @@ def run_negbin_bev(cs: pd.DataFrame):
         rows.append({
             "Variable": var,
             "Coef (log-rate)": f"{result.params[var]:.4f}{stars}",
-            "IRR": f"{math.exp(result.params[var]):.4f}",
+            "IRR": f"{np.exp(result.params[var]):.4f}",
             "SE": f"({result.bse[var]:.4f})",
             "p-value": f"{result.pvalues[var]:.3f}",
         })
@@ -160,21 +177,26 @@ def run_negbin_bev(cs: pd.DataFrame):
     _save_table(df_table, result,
                 "Negative Binomial: BEV Count ~ Climate Ideology (2023 CA Tracts)",
                 "replication_negbin_bev",
-                "IRR = incidence rate ratio (exp of log-rate coefficient). "
-                "Positive IRR > 1 expected.")
+                notes="IRR = incidence rate ratio (exp of log-rate coefficient). "
+                      "Positive IRR > 1 expected.",
+                se_note="MLE standard errors; IRR = exp(coef)")
     return result
 
 
 def make_scatter(cs: pd.DataFrame):
     print("\n  Making replication scatter plots...")
+    cs_scatter = cs.copy()
+    # Second panel: ideology vs EV share (total_bev / total_light)
+    cs_scatter["ev_share"] = cs_scatter["total_bev"] / cs_scatter["total_light"]
+
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
     for ax, (ycol, ylabel, expected_dir) in zip(axes, [
         ("pct_transit", "Transit Commute Share", "(+)"),
-        ("pct_drove_alone", "Drive-Alone Share", "(−)"),
+        ("ev_share", "EV Share (BEV / Total Light Vehicles)", "(+)"),
     ]):
-        x = cs["climate_ideology_index"].values
-        y = cs[ycol].values
+        x = cs_scatter["climate_ideology_index"].values
+        y = cs_scatter[ycol].values
         mask = np.isfinite(x) & np.isfinite(y)
         ax.scatter(x[mask], y[mask], alpha=0.12, s=6, color="#1e40af", rasterized=True)
         m, b = np.polyfit(x[mask], y[mask], 1)
