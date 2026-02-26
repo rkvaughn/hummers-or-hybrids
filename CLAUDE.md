@@ -201,6 +201,33 @@ hummers_or_hybrids_replication/
 
 ---
 
+## Project Status (updated 2026-02-25)
+
+**The full analysis pipeline is complete.** All scripts 01–11 have been written and run successfully. The paper draft (`paper/draft.md`) contains rendered results tables and references generated figures.
+
+| Script | Output | Status |
+|---|---|---|
+| `01_acquire_cec.py` | `data/raw/cec_zev/cec_panel_zev.csv` | Complete |
+| `02_acquire_acs.py` | `data/raw/acs/acs_tracts_ca_2023.csv` | Complete |
+| `03_acquire_ideology.py` | YCOM, voter reg, ballot measure raw files | Complete |
+| `04_crosswalk.py` | 4 crosswalk CSVs in `data/processed/` | Complete |
+| `05_build_panel.py` | `data/processed/panel_tract_year.parquet` (tract × year, 2018–2024) | Complete |
+| `06_ideology_index.py` | PCA composite index; PC1 = 84.7% variance; `data/processed/ideology_tract.parquet` | Complete |
+| `07_replication.py` | OLS transit/drive-alone + log-OLS EV; replication tables in `output/tables/` | Complete |
+| `08_ev_panel.py` | Year-FE panel: Tesla +5.0%, non-Tesla EV +6.1%, light truck −2.3% per SD ideology | Complete |
+| `09_event_study.py` | Elon Effect event study; Tesla ideology link stable post-2022; non-Tesla democratized | Complete |
+| `10_robustness.py` | R1/R2/R3 robustness tables; main results hold across all ideology specs | Complete |
+| `11_spatial.py` | Moran's I = 0.58 (transit), 0.41 (drive-alone); SAR ρ = 0.78 / 0.57; results survive | Complete |
+| `paper/draft.md` | Full Substack draft with rendered tables and figure references | Complete |
+
+**Open items / known gaps:**
+1. `data/raw/afdc/` is empty — EV charger density was never acquired; omitted from all models as a control
+2. Time-varying ACS controls (2019 vintage for early panel years) deferred; noted in Technical Appendix
+3. GitHub repo link placeholder remains in `paper/draft.md` — fill before publishing
+4. 2025 CEC data not yet available; would provide a stronger Elon Effect test (DOGE/Trump events only appear at tail of 2024 panel)
+
+---
+
 ## Instructions for Claude
 
 - Working directory: `~/Projects/hummers_or_hybrids_replication/`
