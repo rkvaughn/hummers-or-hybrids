@@ -233,6 +233,9 @@ def build_r1_county(panel: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
 
+    print("    NOTE: R1 county controls use simple (unweighted) tract means — "
+          "population-weighting would require tract population counts not in panel. "
+          "Interpret R1 control estimates with caution for heterogeneous counties.")
     county = county[county["total_light"] > 0].copy()
     county = county.dropna(subset=available_ycom + CONTROL_COLS
                            + ["pct_transit", "pct_drove_alone"])
@@ -403,8 +406,8 @@ def _save_robustness_table(rows: list, model_type: str, model_label: str,
     stars_note = "*p<0.1, **p<0.05, ***p<0.01"
     footer = (
         f"<p>{stars_note} ({se_note}). {dv_note}<br>"
-        f"R1=county/YCOM-only PCA; R2=tract/voter-reg+ballot PCA; "
-        f"R3=tract/Prop 30 share alone.</p>"
+        f"R1=county/YCOM-only PCA (controls: unweighted tract means — see caveats); "
+        f"R2=tract/voter-reg+ballot PCA; R3=tract/Prop 30 share alone.</p>"
     )
     html = (
         f"<h3>{model_label}</h3>"
@@ -458,8 +461,7 @@ def main():
 
         # Main ── tract level, composite PCA
         print("  [Main] tract / composite PCA index")
-        runner = run_ols if model_type == "ols" else run_negbin
-        if model_type == "ols":
+            if model_type == "ols":
             row = run_ols(tract_cs, dv_col, "climate_ideology_index", "Main")
         else:
             row = run_negbin(tract_cs, "climate_ideology_index", "Main")
