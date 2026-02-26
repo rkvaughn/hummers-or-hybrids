@@ -1,0 +1,5 @@
+Dependent Variable,Ideology Coef,SE,p-value,N,R²
+log(Tesla BEV + 1),+0.0495***,(0.0024),0.000,63021,0.406
+log(Non-Tesla BEV + 1),+0.0605***,(0.0020),0.000,63021,0.318
+log(Light Truck + 1),-0.0226***,(0.0023),0.000,63021,0.094
+Tesla Share of BEVs,+0.0022***,(0.0004),0.000,62984,0.272

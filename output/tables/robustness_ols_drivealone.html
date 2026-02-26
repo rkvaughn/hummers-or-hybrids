@@ -1,0 +1,51 @@
+<h3>Robustness: OLS: Drive-Alone Share ~ Ideology (2023 CA, 4 specifications)</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Specification</th>
+      <th>Ideology_Col</th>
+      <th>Coef</th>
+      <th>SE</th>
+      <th>p-value</th>
+      <th>R2</th>
+      <th>N</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Main</td>
+      <td>climate_ideology_index</td>
+      <td>-0.0184***</td>
+      <td>(0.0006)</td>
+      <td>0.000</td>
+      <td>0.594</td>
+      <td>9003</td>
+    </tr>
+    <tr>
+      <td>R1 (county/YCOM)</td>
+      <td>r1_ideology</td>
+      <td>-0.0078**</td>
+      <td>(0.0036)</td>
+      <td>0.030</td>
+      <td>0.821</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <td>R2 (tract/no YCOM)</td>
+      <td>r2_ideology</td>
+      <td>-0.0288***</td>
+      <td>(0.0009)</td>
+      <td>0.000</td>
+      <td>0.596</td>
+      <td>9003</td>
+    </tr>
+    <tr>
+      <td>R3 (Prop 30 share)</td>
+      <td>prop30_yes_share</td>
+      <td>-0.6973***</td>
+      <td>(0.0209)</td>
+      <td>0.000</td>
+      <td>0.611</td>
+      <td>9003</td>
+    </tr>
+  </tbody>
+</table><p>*p<0.1, **p<0.05, ***p<0.01 (HC3 robust SEs). Kahn (2007) analog: negative ideology coefficient expected.<br>R1=county/YCOM-only PCA (controls: unweighted tract means — see caveats); R2=tract/voter-reg+ballot PCA; R3=tract/Prop 30 share alone.</p>

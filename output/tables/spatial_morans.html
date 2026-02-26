@@ -1,0 +1,30 @@
+<h3>Moran's I — OLS Residuals Spatial Autocorrelation Test</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Model</th>
+      <th>Moran_I</th>
+      <th>Expected_I</th>
+      <th>p_sim</th>
+      <th>Significant_p05</th>
+      <th>Permutations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Transit Commute Share</td>
+      <td>0.5816</td>
+      <td>-0.0001</td>
+      <td>0.001</td>
+      <td>YES (p&lt;0.05)</td>
+      <td>999</td>
+    </tr>
+    <tr>
+      <td>Drive-Alone Commute Share</td>
+      <td>0.4080</td>
+      <td>-0.0001</td>
+      <td>0.001</td>
+      <td>YES (p&lt;0.05)</td>
+      <td>999</td>
+    </tr>
+  </tbody>
+</table><p>Moran's I on OLS residuals (same models as Script 07, 2023 CA Census tracts). Row-standardized queen contiguity weights. p-sim = pseudo p-value from 999 random permutations. Significant p<0.05 triggers SAR correction in spatial_sar.{csv,html}.</p>

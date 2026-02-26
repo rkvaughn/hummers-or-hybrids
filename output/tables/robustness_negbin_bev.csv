@@ -1,0 +1,5 @@
+Specification,Ideology_Col,Coef (log-rate),SE,p-value,IRR,N
+Main,climate_ideology_index,0.0854,(nan),nan,1.0892,9003
+R1 (county/YCOM),r1_ideology,-0.0224,(nan),nan,0.9779,58
+R2 (tract/no YCOM),r2_ideology,0.1246,(nan),nan,1.1327,9003
+R3 (Prop 30 share),prop30_yes_share,1.9123,(nan),nan,6.7686,9003

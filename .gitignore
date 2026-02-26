@@ -24,6 +24,6 @@ notebooks/.ipynb_checkpoints/
 .vscode/
 .idea/
 
-# Output (generated figures and tables — large, reproducible)
-output/figures/
-output/tables/
+# Output — tracked so paper figures and tables render on GitHub
+# output/figures/
+# output/tables/

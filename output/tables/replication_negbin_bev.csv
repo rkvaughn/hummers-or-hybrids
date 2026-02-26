@@ -1,0 +1,9 @@
+Variable,Coef (log-rate),IRR,SE,p-value
+Intercept,-6.6043,0.0014,(nan),nan
+climate_ideology_index,0.0854,1.0892,(nan),nan
+log_median_hh_income,0.1227,1.1306,(nan),nan
+pct_ba_plus,2.3406,10.3876,(nan),nan
+pop_density,0.0002,1.0002,(nan),nan
+pct_white,0.4410,1.5543,(nan),nan
+pct_wfh,1.5224,4.5831,(nan),nan
+alpha,1.5793,4.8517,(nan),nan

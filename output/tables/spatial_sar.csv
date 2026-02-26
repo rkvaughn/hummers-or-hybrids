@@ -1,0 +1,3 @@
+Model,rho,rho_se,rho_z,rho_p,Pseudo_R2,N,Note
+Transit Commute Share,0.7807***,(0.0077),100.923,0.0000,0.7261,9003,Spatial Lag Model (SAR) via ML. rho = spatial autoregressive coefficient. Positive rho indicates positive spatial spillovers in the DV.
+Drive-Alone Commute Share,0.5666***,(0.0093),61.132,0.0000,0.7323,9003,Spatial Lag Model (SAR) via ML. rho = spatial autoregressive coefficient. Positive rho indicates positive spatial spillovers in the DV.

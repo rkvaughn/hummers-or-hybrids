@@ -1,0 +1,36 @@
+<h3>Spatial Lag Model (SAR) — Corrected Estimates</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Model</th>
+      <th>rho</th>
+      <th>rho_se</th>
+      <th>rho_z</th>
+      <th>rho_p</th>
+      <th>Pseudo_R2</th>
+      <th>N</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Transit Commute Share</td>
+      <td>0.7807***</td>
+      <td>(0.0077)</td>
+      <td>100.923</td>
+      <td>0.0000</td>
+      <td>0.7261</td>
+      <td>9003</td>
+      <td>Spatial Lag Model (SAR) via ML. rho = spatial autoregressive coefficient. Positive rho indicates positive spatial spillovers in the DV.</td>
+    </tr>
+    <tr>
+      <td>Drive-Alone Commute Share</td>
+      <td>0.5666***</td>
+      <td>(0.0093)</td>
+      <td>61.132</td>
+      <td>0.0000</td>
+      <td>0.7323</td>
+      <td>9003</td>
+      <td>Spatial Lag Model (SAR) via ML. rho = spatial autoregressive coefficient. Positive rho indicates positive spatial spillovers in the DV.</td>
+    </tr>
+  </tbody>
+</table><p>Spatial Lag Model (SAR) estimated via maximum likelihood. rho = spatial autoregressive coefficient on the spatially lagged dependent variable. Positive rho indicates positive spatial autocorrelation after controlling for covariates. X variables identical to Script 07 OLS. *p&lt;0.1, **p&lt;0.05, ***p&lt;0.01 (z-test on rho).</p>
