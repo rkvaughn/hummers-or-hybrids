@@ -1,0 +1,13 @@
+{
+  "name": "zephyr-claude-hooks",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Claude Code hooks for Zephyr project",
+  "scripts": {
+    "test": "tsx skill-activation-prompt.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.7.0",
+    "@types/node": "^20.11.0"
+  }
+}

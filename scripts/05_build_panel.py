@@ -135,22 +135,37 @@ def build_ycom_tract() -> pd.DataFrame:
 
 
 def build_votreg_tract() -> pd.DataFrame:
-    print("  [3] Crosswalking voter registration to tracts...")
+    """
+    Aggregate voter registration to county level, then assign county value
+    to all tracts in the county (same approach as YCOM).
+
+    Note: SWDB registration precincts use RGPREC_KEY (13-char) which does not
+    match the MPREC shapefile PREC_KEY (11-char) used by the precinct→tract
+    crosswalk. County-level aggregation via the FIPS column is used instead.
+    """
+    print("  [3] Crosswalking voter registration to tracts (county-level)...")
     votreg_path = RAW / "voter_registration" / "votreg_ca_raw.csv"
     if not votreg_path.exists():
         print("    WARNING: votreg_ca_raw.csv not found — skipping voter reg")
         return pd.DataFrame(columns=["tract_geoid_20", "dem_minus_rep"])
 
-    xwalk = pd.read_csv(PROCESSED / "crosswalk_prec_tract_g22.csv",
-                        dtype={"pctkey": str, "tract_geoid_20": str})
+    xwalk = pd.read_csv(PROCESSED / "crosswalk_county_tract.csv",
+                        dtype={"county_fips": str, "tract_geoid_20": str})
     votreg = pd.read_csv(votreg_path, dtype=str, low_memory=False)
     votreg.columns = [c.upper().strip() for c in votreg.columns]
+    # Deduplicate column names — stacking g22+g20 files can produce duplicates
+    votreg = votreg.loc[:, ~votreg.columns.duplicated(keep="first")]
 
-    key_candidates = ["PCTKEY", "PCTFIPS", "PCT_KEY", "PREC_KEY", "MPREC_KEY", "PRECINCT_ID"]
-    pct_col = next((c for c in votreg.columns if c in key_candidates), None)
-    if pct_col is None:
-        pct_col = next((c for c in votreg.columns if votreg[c].dtype == object), None)
-        print(f"    WARNING: using '{pct_col}' as precinct key")
+    # Filter to g22 registration snapshot
+    if "ELECTION" in votreg.columns:
+        g22 = votreg[votreg["ELECTION"].str.lower() == "g22"].copy()
+        if len(g22) > 0:
+            votreg = g22
+            print(f"    Using g22 election data: {len(votreg):,} precincts")
+
+    if "FIPS" not in votreg.columns:
+        print(f"    WARNING: FIPS column not found. Available: {list(votreg.columns[:15])}")
+        return pd.DataFrame(columns=["tract_geoid_20", "dem_minus_rep"])
 
     dem_col = next((c for c in votreg.columns if c in ("DEM", "DEM_REG", "DEM_1")), None)
     rep_col = next((c for c in votreg.columns if c in ("REP", "REP_REG", "REP_1")), None)
@@ -158,21 +173,28 @@ def build_votreg_tract() -> pd.DataFrame:
         print(f"    WARNING: DEM/REP columns not found. Available: {list(votreg.columns[:20])}")
         return pd.DataFrame(columns=["tract_geoid_20", "dem_minus_rep"])
 
+    votreg["county_fips"] = votreg["FIPS"].astype(str).str.zfill(5)
     votreg[dem_col] = pd.to_numeric(votreg[dem_col], errors="coerce").fillna(0)
     votreg[rep_col] = pd.to_numeric(votreg[rep_col], errors="coerce").fillna(0)
-    votreg["total_reg"] = votreg[dem_col] + votreg[rep_col]
-    votreg = votreg.rename(columns={pct_col: "pctkey"})
-    votreg["pctkey"] = votreg["pctkey"].astype(str)
 
-    merged = votreg[["pctkey", dem_col, rep_col, "total_reg"]].merge(
-        xwalk, on="pctkey", how="inner"
+    # Aggregate to county
+    county_reg = votreg.groupby("county_fips")[[dem_col, rep_col]].sum().reset_index()
+    county_reg["total_reg"] = county_reg[dem_col] + county_reg[rep_col]
+    county_reg["dem_minus_rep"] = (
+        (county_reg[dem_col] - county_reg[rep_col])
+        / county_reg["total_reg"].replace(0, np.nan)
     )
-    for col in [dem_col, rep_col, "total_reg"]:
-        merged[col] = merged[col] * merged["weight"]
+    print(f"    County voter reg: {len(county_reg)} counties aggregated")
 
-    tract_reg = merged.groupby("tract_geoid_20")[[dem_col, rep_col, "total_reg"]].sum().reset_index()
-    tract_reg["dem_minus_rep"] = (tract_reg[dem_col] - tract_reg[rep_col]) / tract_reg["total_reg"].replace(0, pd.NA)
-    result = tract_reg[["tract_geoid_20", "dem_minus_rep"]]
+    # Assign county value to all tracts in that county
+    result = xwalk.merge(county_reg[["county_fips", "dem_minus_rep"]],
+                         on="county_fips", how="left")
+    null_pct = result["dem_minus_rep"].isna().mean() * 100
+    if null_pct > 1:
+        print(f"    WARNING: dem_minus_rep null rate: {null_pct:.1f}%")
+    else:
+        print(f"    dem_minus_rep null rate: {null_pct:.1f}% (expected 0)")
+    result = result[["tract_geoid_20", "dem_minus_rep"]]
     print(f"    Voter reg tract table: {len(result):,} rows")
     return result
 
@@ -185,65 +207,77 @@ def _extract_prop_share(df: pd.DataFrame, yes_col: str, no_col: str) -> pd.Serie
 
 
 def build_ballot_tract() -> pd.DataFrame:
-    print("  [4] Crosswalking ballot measures to tracts...")
-    results = {}
+    """
+    Aggregate ballot measure votes to county level, then assign county value
+    to all tracts in the county (same approach as YCOM).
+
+    Note: SWDB ballot data uses SVPREC_KEY (voting precinct, 11-char) which does
+    not match the MPREC shapefile PREC_KEY (11-char, different numbering) used
+    by the precinct→tract crosswalk. County-level aggregation via the FIPS
+    column is used instead.
+    """
+    print("  [4] Crosswalking ballot measures to tracts (county-level)...")
+
+    xwalk = pd.read_csv(PROCESSED / "crosswalk_county_tract.csv",
+                        dtype={"county_fips": str, "tract_geoid_20": str})
 
     ballot_configs = [
-        ("g22", "ballots_g22_raw.csv", "prop30_yes_share", "PR_30_Y", "PR_30_N"),
-        ("p18", "ballots_p18_raw.csv", "prop68_yes_share", "PR_68_Y", "PR_68_N"),
+        ("ballots_g22_raw.csv", "prop30_yes_share", "PR_30_Y", "PR_30_N"),
+        ("ballots_p18_raw.csv", "prop68_yes_share", "PR_68_Y", "PR_68_N"),
     ]
 
-    for vintage, fname, out_col, yes_col, no_col in ballot_configs:
+    county_results = {}
+    for fname, out_col, yes_col, no_col in ballot_configs:
         bpath = RAW / "ballot_measures" / fname
-        xwalk_path = PROCESSED / f"crosswalk_prec_tract_{vintage}.csv"
-        if not bpath.exists() or not xwalk_path.exists():
-            print(f"    WARNING: {fname} or crosswalk not found — skipping {out_col}")
+        if not bpath.exists():
+            print(f"    WARNING: {fname} not found — skipping {out_col}")
             continue
 
         df = pd.read_csv(bpath, dtype=str, low_memory=False)
         df.columns = [c.upper().strip() for c in df.columns]
 
-        actual_yes = next((c for c in df.columns if c.startswith(yes_col[:4])), None)
-        actual_no = next((c for c in df.columns if c.startswith(no_col[:4])), None)
+        actual_yes = next((c for c in df.columns if c == yes_col), None)
+        actual_no = next((c for c in df.columns if c == no_col), None)
         if actual_yes is None or actual_no is None:
             prop_cols = [c for c in df.columns if c.startswith("PR_")]
             print(f"    WARNING: {yes_col}/{no_col} not found. Prop cols: {prop_cols[:20]}")
             continue
 
-        xwalk = pd.read_csv(xwalk_path, dtype={"pctkey": str, "tract_geoid_20": str})
-        key_candidates = ["PCTKEY", "PCTFIPS", "PCT_KEY", "PREC_KEY", "MPREC_KEY"]
-        pct_col = next((c for c in df.columns if c in key_candidates), None)
-        if pct_col is None:
-            print(f"    WARNING: no precinct key found in {fname}")
+        if "FIPS" not in df.columns:
+            print(f"    WARNING: FIPS column not found in {fname}")
             continue
 
+        df["county_fips"] = df["FIPS"].astype(str).str.zfill(5)
         df[actual_yes] = pd.to_numeric(df[actual_yes], errors="coerce").fillna(0)
         df[actual_no] = pd.to_numeric(df[actual_no], errors="coerce").fillna(0)
-        df["_total_votes"] = df[actual_yes] + df[actual_no]
-        df = df.rename(columns={pct_col: "pctkey"}) if pct_col != "pctkey" else df
-        df["pctkey"] = df["pctkey"].astype(str)
 
-        keep_cols = ["pctkey", actual_yes, "_total_votes"]
-        merged = df[keep_cols].merge(xwalk, on="pctkey", how="left")
-        unmatched = merged["weight"].isna().sum()
-        if unmatched > 0:
-            print(f"    WARNING: {unmatched} precinct rows had no crosswalk match ({out_col})")
-        merged = merged[merged["weight"].notna()]
-        merged[actual_yes] = merged[actual_yes] * merged["weight"]
-        merged["_total_votes"] = merged["_total_votes"] * merged["weight"]
+        # Aggregate to county
+        county = df.groupby("county_fips")[[actual_yes, actual_no]].sum().reset_index()
+        county["_total"] = county[actual_yes] + county[actual_no]
+        county[out_col] = county[actual_yes] / county["_total"].replace(0, np.nan)
+        print(f"    {out_col}: {len(county)} counties aggregated "
+              f"(mean share: {county[out_col].mean():.3f})")
+        county_results[out_col] = county[["county_fips", out_col]]
 
-        tract_ballot = merged.groupby("tract_geoid_20")[[actual_yes, "_total_votes"]].sum().reset_index()
-        tract_ballot[out_col] = tract_ballot[actual_yes] / tract_ballot["_total_votes"].replace(0, float("nan"))
-        tract_ballot = tract_ballot[["tract_geoid_20", out_col]]
-        results[out_col] = tract_ballot
-        print(f"    {out_col}: {len(tract_ballot):,} tracts")
-
-    if not results:
+    if not county_results:
         return pd.DataFrame(columns=["tract_geoid_20", "prop30_yes_share", "prop68_yes_share"])
-    base = list(results.values())[0]
-    for other in list(results.values())[1:]:
-        base = base.merge(other, on="tract_geoid_20", how="outer")
-    return base
+
+    # Merge all county-level ballot results together
+    county_df = list(county_results.values())[0]
+    for other in list(county_results.values())[1:]:
+        county_df = county_df.merge(other, on="county_fips", how="outer")
+
+    # Assign county values to all tracts in that county
+    result = xwalk.merge(county_df, on="county_fips", how="left")
+    for col in county_results:
+        null_pct = result[col].isna().mean() * 100
+        if null_pct > 1:
+            print(f"    WARNING: {col} null rate: {null_pct:.1f}%")
+        else:
+            print(f"    {col} null rate: {null_pct:.1f}% (expected 0)")
+    result = result[["tract_geoid_20"] + list(county_results.keys())]
+    print(f"    Ballot tract table: {len(result):,} rows")
+    return result
 
 
 def build_acs_tract() -> pd.DataFrame:

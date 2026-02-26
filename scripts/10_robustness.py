@@ -162,8 +162,10 @@ def load_data() -> tuple:
         on="tract_geoid_20", how="left"
     )
 
-    # Also pull raw ideology columns from panel (needed for R2 and R3)
-    raw_ideo_cols = [c for c in R2_COLS + YCOM_COLS if c in panel.columns]
+    # Raw ideology columns (R2, R3) are already in the panel — no extra merge needed.
+    # Only merge columns not yet present in cs to avoid _x/_y suffix duplication.
+    raw_ideo_cols = [c for c in R2_COLS + YCOM_COLS
+                     if c in panel.columns and c not in cs.columns]
     if raw_ideo_cols:
         ideo_raw = (
             panel[panel["data_year"] == 2023][["tract_geoid_20"] + raw_ideo_cols]
@@ -461,7 +463,7 @@ def main():
 
         # Main ── tract level, composite PCA
         print("  [Main] tract / composite PCA index")
-            if model_type == "ols":
+        if model_type == "ols":
             row = run_ols(tract_cs, dv_col, "climate_ideology_index", "Main")
         else:
             row = run_negbin(tract_cs, "climate_ideology_index", "Main")

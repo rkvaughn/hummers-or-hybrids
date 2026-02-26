@@ -1,0 +1,217 @@
+{
+  "version": "1.0",
+  "skills": {
+    "test-driven-development": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "promptTriggers": {
+        "keywords": [
+          "implement",
+          "add feature",
+          "build",
+          "create function",
+          "new feature",
+          "fix bug",
+          "bugfix"
+        ],
+        "intentPatterns": [
+          "let'?s (implement|add|build|create)",
+          "can you (implement|add|build|create)",
+          "i need (to )?(implement|add|build|create)"
+        ]
+      }
+    },
+    "systematic-debugging": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "promptTriggers": {
+        "keywords": [
+          "error",
+          "failing",
+          "broken",
+          "bug",
+          "issue",
+          "not working",
+          "doesn't work",
+          "fails"
+        ],
+        "intentPatterns": [
+          "why (is|does|did)",
+          "tests? (fail|failing|failed)",
+          "getting (an? )?(error|exception)"
+        ]
+      }
+    },
+    "writing-plans": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "promptTriggers": {
+        "keywords": [
+          "plan",
+          "design",
+          "architecture",
+          "approach",
+          "strategy",
+          "multi-step"
+        ],
+        "intentPatterns": [
+          "how should (i|we) (implement|approach|design)",
+          "what'?s the best (way|approach) to",
+          "let'?s plan"
+        ]
+      }
+    },
+    "executing-plans": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "promptTriggers": {
+        "keywords": [
+          "execute plan",
+          "implement plan",
+          "follow plan",
+          "start implementation"
+        ],
+        "intentPatterns": [
+          "execute (the )?plan",
+          "implement (the )?plan",
+          "let'?s execute"
+        ]
+      }
+    },
+    "requesting-code-review": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "promptTriggers": {
+        "keywords": [
+          "review",
+          "check this",
+          "look at",
+          "completed",
+          "finished",
+          "done with"
+        ],
+        "intentPatterns": [
+          "can you review",
+          "please review",
+          "i'?ve (completed|finished)",
+          "just (completed|finished|done)"
+        ]
+      }
+    },
+    "verification-before-completion": {
+      "type": "guardrail",
+      "enforcement": "warn",
+      "priority": "critical",
+      "promptTriggers": {
+        "keywords": [
+          "it works",
+          "tests pass",
+          "it's done",
+          "completed",
+          "finished",
+          "ready"
+        ],
+        "intentPatterns": [
+          "tests? (pass|passing|passed)",
+          "it'?s (done|ready|working|complete)",
+          "all (done|set|good)"
+        ]
+      }
+    },
+    "using-git-worktrees": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": [
+          "new feature",
+          "start work",
+          "begin implementation",
+          "isolated workspace"
+        ],
+        "intentPatterns": [
+          "start (working on|implementing) (a )?feature",
+          "let'?s work on",
+          "need (an? )?isolated (branch|workspace)"
+        ]
+      }
+    },
+    "subagent-driven-development": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": [
+          "complex feature",
+          "multiple components",
+          "spec to implementation"
+        ],
+        "intentPatterns": [
+          "complex (feature|implementation)",
+          "(build|create) (a )?complete (feature|system)"
+        ]
+      }
+    },
+    "dispatching-parallel-agents": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": [
+          "multiple tasks",
+          "parallel",
+          "independent tasks",
+          "at the same time"
+        ],
+        "intentPatterns": [
+          "(run|do|execute) .* (in parallel|simultaneously|at once)",
+          "multiple independent"
+        ]
+      }
+    },
+    "finishing-a-development-branch": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "promptTriggers": {
+        "keywords": [
+          "ready to merge",
+          "create pr",
+          "pull request",
+          "finish branch",
+          "complete work"
+        ],
+        "intentPatterns": [
+          "(create|open|make) (a )?pr",
+          "ready (to|for) (merge|pr)",
+          "(finish|complete) (the )?branch"
+        ]
+      }
+    },
+    "brainstorming": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "promptTriggers": {
+        "keywords": [
+          "ideas",
+          "options",
+          "possibilities",
+          "brainstorm",
+          "explore",
+          "what if"
+        ],
+        "intentPatterns": [
+          "what (are )?.*options",
+          "how (could|can) (i|we)",
+          "let'?s (explore|brainstorm)"
+        ]
+      }
+    }
+  }
+}

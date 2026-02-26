@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(source:*)",
+      "Bash(find:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(ruff:*)",
+      "Bash(touch:*)",
+      "Bash(chmod:*)",
+      "Bash(cat:*)",
+      "Bash(ruff check:*)",
+      "Bash(pytest:*)",
+      "Bash(python:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(python3 -m pytest:*)",
+      "WebFetch(domain:*)",
+      "Bash(gh issue view:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(sort:*)",
+      "Bash(perl:*)",
+      "Bash(awk:*)",
+      "WebFetch(domain:stripe.com)",
+      "WebFetch(domain:plaid.com)",
+      "Bash(npm run dev)",
+      "Bash(xargs:*)",
+      "Bash(/Users/johnmorehouse/Desktop/moat/zephyr/backend/.venv/bin/python:*)",
+      "Bash(/Users/johnmorehouse/Desktop/moat/zephyr/backend/.venv/bin/python -m pip install:*)",
+      "Bash(python3 -m venv:*)",
+      "Bash(./pdf_env/bin/pip install:*)",
+      "Bash(git diff:*)"
+    ],
+    "deny": []
+  }
+}
