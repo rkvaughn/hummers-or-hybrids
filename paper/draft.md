@@ -1,6 +1,6 @@
 # Hummers or Hybrids, 2025 Edition: Did Tesla Buyers Stop Being Environmentalists?
 
-*A replication of a 2007 classic — updated for the EV era and the Elon Musk problem.*
+*An experiment in a purely prompted collaboration: If it got any of it correct we are in such big trouble*
 
 **Ryan Vaughn & John Morehouse** · February 2026
 
@@ -27,9 +27,9 @@ baggage tag it never asked for.
 So: does climate ideology still predict who drives an EV? And has it stopped predicting
 who drives a Tesla?
 
-I replicated Kahn's study using modern data — CEC vehicle registration records, Yale
+We replicated Kahn's study using modern data — CEC vehicle registration records, Yale
 climate opinion surveys, and California voter data — and extended it into the EV era.
-Here's what I found.
+Here's what we found.
 
 ---
 
@@ -38,10 +38,10 @@ Here's what I found.
 First, the boring-but-important confirmation: California communities with stronger climate
 change beliefs still exhibit lower-carbon transportation behavior today.
 
-Using the 2023 American Community Survey and California vehicle registration data, I
+Using the 2023 American Community Survey and California vehicle registration data, we
 constructed a *Climate Ideology Index* — a composite of Yale Climate Opinion Maps county
 estimates, Democratic-minus-Republican voter registration share, and vote share on
-Proposition 30 (the 2022 EV infrastructure initiative). I ran this index against commute
+Proposition 30 (the 2022 EV infrastructure initiative). We ran this index against commute
 behavior and vehicle ownership across California's ~9,100 Census tracts.
 
 The results track Kahn's original findings closely:
@@ -160,7 +160,7 @@ relatively more Teslas than in 2018, and that advantage held through 2024. Meanw
 non-Tesla EV market was democratizing — lower-ideology communities were catching up.
 The relative Tesla advantage among climate-concerned communities did not erode.
 
-I want to be careful about what this does and doesn't show. The Elon Effect may yet emerge
+We want to be careful about what this does and doesn't show. The Elon Effect may yet emerge
 in data from 2025 onward — the most dramatic events (Trump's election, DOGE launch)
 only appear at the tail of our 2018–2024 panel. This analysis cannot test whether things
 have changed since.
@@ -233,16 +233,16 @@ geographically concentrated. The ideology coefficients survive the spatial corre
 ## What This Can and Can't Say
 
 **This is about communities, not individuals.** The unit of analysis is the Census tract.
-I observe that tracts with stronger climate beliefs have different transportation and EV
-patterns. I cannot directly observe which households within a tract are buying EVs or why.
+We observe that tracts with stronger climate beliefs have different transportation and EV
+patterns. We cannot directly observe which households within a tract are buying EVs or why.
 The ecological inference problem Kahn acknowledged in 2007 applies here too.
 
-**I can't fully isolate the Elon Effect.** Musk's political shift coincides with rising
+**We can't fully isolate the Elon Effect.** Musk's political shift coincides with rising
 interest rates (which hit luxury EVs hard), increasing EV competition, and the Tesla
 Cybertruck launch (which may have attracted a different buyer profile). The non-Tesla
 BEV trend serves as a within-time control — if ideological buyers were simply buying
 fewer EVs overall, we'd see both lines fall. The divergence pattern is harder to explain
-by market forces alone, but I can't rule out price point differences or other confounders.
+by market forces alone, but we can't rule out price point differences or other confounders.
 
 **The data ends in 2024.** The most significant Musk-political events (DOGE launch, Trump
 administration) only appear at the tail of our observation window. A more definitive test
@@ -328,4 +328,4 @@ implemented.
 
 ---
 
-*Ryan Vaughn is a PhD student in economics. Find him at [ryankvaughn.com](https://ryankvaughn.com) or on GitHub at [@rkvaughn](https://github.com/rkvaughn). John Morehouse is an economist. Find him on GitHub at [@johnmorehouse-7](https://github.com/johnmorehouse-7). This project was completed with the assistance of Claude (Anthropic) — both authors used Claude Code as a collaborative partner throughout data acquisition, analysis, and writing.*
+*Ryan Vaughn is an independent researcher in economics. Find him at [ryankvaughn.com](https://ryankvaughn.com) or on GitHub at [@rkvaughn](https://github.com/rkvaughn). John Morehouse is an independent researcher in economics. Find him on GitHub at [@johnmorehouse-7](https://github.com/johnmorehouse-7). This project was completed with the assistance of Claude (Anthropic) — both authors used Claude Code as a collaborative partner throughout data acquisition, analysis, and writing.*
