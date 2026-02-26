@@ -209,8 +209,9 @@ def fetch_lcv_scores() -> pd.DataFrame:
             dist_num = None
             score = None
             if dist_col:
+                import re as _re
                 dist_num = pd.to_numeric(
-                    str(row[dist_col]).strip().lstrip("CA-").lstrip("0") or "0",
+                    _re.sub(r"^CA-0*", "", str(row[dist_col]).strip()) or "0",
                     errors="coerce"
                 )
             if score_col:
