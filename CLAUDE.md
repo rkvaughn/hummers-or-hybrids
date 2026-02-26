@@ -237,8 +237,21 @@ Multiple frames contain figures or regression tables that are too large for the 
 - Move secondary tables to appendix frames if they are not essential to the main narrative
 After fixing, recompile with `tectonic slides.tex` from the `paper/` directory and verify the PDF visually before committing.
 
-**B2 — Address stock vs. flow critique (`paper/draft_revised.md`)**
-See `paper/peer_review_kahn_simulated.md` for full instructions. Short version: inspect `scripts/01_acquire_cec.py` to determine whether the CEC panel is cumulative registrations (stock) or new registrations (flow). If stock, propose and implement a first-difference specification. Write the response as an author reply to the reviewer in `paper/draft_revised.md`.
+**B2 — Address stock vs. flow critique (`paper/draft_revised.md`)** ⚠️ CONFIRMED ISSUE
+
+**Finding (investigated 2026-02-25):** The CEC data is definitively **stock** (cumulative registered vehicles). The script docstring states "Snapshot date: Each file is a December 31 end-of-year snapshot." The raw data confirms monotonic growth: Tesla BEV counts go 88K → 177K → 239K → 352K → 523K → 697K → 854K (2018–2024). The Gemini-as-Kahn critique is correct and substantive.
+
+**Why this matters for the event study:** With ~156K new Teslas added per year against a 2024 stock of 854K, annual turnover is roughly 18%. By end of 2024, only ~33% of the stock reflects post-Oct-2022 purchases. If the Elon Effect exists, it is attenuated by the large accumulated pre-Musk stock in high-ideology tracts. The null result cannot be taken at face value.
+
+**Note — the baseline cross-sections (Tables 1–3) are unaffected.** Stock levels are a valid outcome for "do greener tracts have more EVs." The problem is specific to the event study (Section: The Elon Effect), which requires *changes* in purchasing behavior to be detectable.
+
+**One partially mitigating observation:** Non-Tesla BEVs show a dip in the event study (2021–2022 coefficients go negative), suggesting the specification IS sensitive to purchasing-rate changes and is not purely reflecting accumulated stock. The non-Tesla dip likely reflects cheaper non-Tesla EVs spreading into lower-ideology tracts. So the event study is not entirely uninformative — but it is attenuated.
+
+**Recommended fix for John's Claude:**
+1. Compute first-differenced outcome: `Δlog(Tesla_BEV + 1)_it = log(Tesla_BEV + 1)_it − log(Tesla_BEV + 1)_{i,t-1}`. This approximates net new registrations (new purchases minus retirements/transfers out of CA).
+2. Re-run the event study (script 09) on `Δlog(Tesla+1)` and `Δlog(NonTesla_BEV+1)` as dependent variables. Keep the same ideology × year interaction specification.
+3. In `paper/draft_revised.md`, write an author reply to the reviewer that: (a) concedes the stock/flow problem, (b) presents the first-difference event study results, (c) interprets whether the Elon Effect is detectable in net new registrations. If the first-difference event study also shows a flat Tesla coefficient, that is a stronger null result — the ideology–Tesla link held even in new purchases post-2022. If the first-difference shows a decline, the original event study was masking it.
+4. See `paper/peer_review_kahn_simulated.md` for the full reviewer instructions block.
 
 ---
 
