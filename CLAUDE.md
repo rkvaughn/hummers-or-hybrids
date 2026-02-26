@@ -225,6 +225,20 @@ hummers_or_hybrids_replication/
 2. Time-varying ACS controls (2019 vintage for early panel years) deferred; noted in Technical Appendix
 3. GitHub repo link placeholder remains in `paper/draft.md` — fill before publishing
 4. 2025 CEC data not yet available; would provide a stronger Elon Effect test (DOGE/Trump events only appear at tail of 2024 panel)
+5. `paper/slides.tex` — several frames have figures or tables that overflow the slide boundary; layout needs fixing before the deck is presentation-ready (see backlog item B1 below)
+
+**Backlog for John's Claude (priority order):**
+
+**B1 — Fix Beamer slide overflow (`paper/slides.tex`)**
+Multiple frames contain figures or regression tables that are too large for the slide area, causing content to spill off-page or be clipped. When you open this file, audit every frame and fix overflow issues using one or more of the following approaches:
+- Scale figures with `\includegraphics[width=\textwidth]{...}` or `height=0.7\textheight` constraints
+- Wrap tables in `\resizebox{\textwidth}{!}{...}` or use `\small`/`\footnotesize` font size reduction
+- Split dense frames across two slides using `\framebreak` (requires `allowframebreaks` option) or manual duplication
+- Move secondary tables to appendix frames if they are not essential to the main narrative
+After fixing, recompile with `tectonic slides.tex` from the `paper/` directory and verify the PDF visually before committing.
+
+**B2 — Address stock vs. flow critique (`paper/draft_revised.md`)**
+See `paper/peer_review_kahn_simulated.md` for full instructions. Short version: inspect `scripts/01_acquire_cec.py` to determine whether the CEC panel is cumulative registrations (stock) or new registrations (flow). If stock, propose and implement a first-difference specification. Write the response as an author reply to the reviewer in `paper/draft_revised.md`.
 
 ---
 
