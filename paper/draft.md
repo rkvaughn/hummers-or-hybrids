@@ -2,6 +2,10 @@
 
 *A replication of a 2007 classic — updated for the EV era and the Elon Musk problem.*
 
+**Ryan Vaughn** · [ryankvaughn.com](https://ryankvaughn.com) · February 2026
+
+*Data: California CEC ZEV registrations (2018–2024), Yale Climate Opinion Maps, CA Secretary of State. Code: [github.com/rkvaughn/hummers-or-hybrids](https://github.com/rkvaughn/hummers-or-hybrids)*
+
 ---
 
 In 2007, economist Matthew Kahn asked a simple question: do people who care about the
@@ -262,7 +266,7 @@ All data is publicly available:
 - **Voter registration and ballot results:** California Secretary of State / UC Berkeley
   Statewide Database (https://statewidedatabase.org/)
 
-Replication code: [GitHub link when published]
+Replication code: [github.com/rkvaughn/hummers-or-hybrids](https://github.com/rkvaughn/hummers-or-hybrids)
 
 ---
 
@@ -316,4 +320,6 @@ implemented.
 
 ---
 
-*[Author bio / contact]*
+---
+
+*Ryan Vaughn is a PhD student in economics. Find him at [ryankvaughn.com](https://ryankvaughn.com) or on GitHub at [@rkvaughn](https://github.com/rkvaughn).*
