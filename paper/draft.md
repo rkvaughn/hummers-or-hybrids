@@ -2,9 +2,13 @@
 
 *A replication of a 2007 classic — updated for the EV era and the Elon Musk problem.*
 
-**Ryan Vaughn** · [ryankvaughn.com](https://ryankvaughn.com) · February 2026
+**Ryan Vaughn & John Morehouse** · February 2026
+
+*[ryankvaughn.com](https://ryankvaughn.com) · [@rkvaughn](https://github.com/rkvaughn) · [@johnmorehouse-7](https://github.com/johnmorehouse-7)*
 
 *Data: California CEC ZEV registrations (2018–2024), Yale Climate Opinion Maps, CA Secretary of State. Code: [github.com/rkvaughn/hummers-or-hybrids](https://github.com/rkvaughn/hummers-or-hybrids)*
+
+> **AI disclosure:** This project was conceived, coded, and written with the assistance of [Claude](https://claude.ai) (Anthropic). Both authors used Claude Code as a collaborative coding partner throughout the research pipeline — from data acquisition and crosswalk construction through regression analysis, figure generation, and manuscript drafting. The two authors' Claude instances independently contributed to the shared codebase via GitHub.
 
 ---
 
@@ -322,4 +326,6 @@ implemented.
 
 ---
 
-*Ryan Vaughn is a PhD student in economics. Find him at [ryankvaughn.com](https://ryankvaughn.com) or on GitHub at [@rkvaughn](https://github.com/rkvaughn).*
+---
+
+*Ryan Vaughn is a PhD student in economics. Find him at [ryankvaughn.com](https://ryankvaughn.com) or on GitHub at [@rkvaughn](https://github.com/rkvaughn). John Morehouse is an economist. Find him on GitHub at [@johnmorehouse-7](https://github.com/johnmorehouse-7). This project was completed with the assistance of Claude (Anthropic) — both authors used Claude Code as a collaborative partner throughout data acquisition, analysis, and writing.*
