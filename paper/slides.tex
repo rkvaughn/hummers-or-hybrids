@@ -1,32 +1,38 @@
-%% slides.tex — Beamer presentation
+%% slides.tex -- Beamer presentation
 %% Hummers or Hybrids, 2025 Edition
 %% Vaughn & Morehouse
 %%
-%% Compile: pdflatex slides.tex  (run twice for cross-refs)
+%% Compile: tectonic slides.tex  (from paper/ directory)
 %% Figures: run scripts/12_component_maps.py before compiling to generate
 %%          the appendix ideology component maps.
+%%
+%% Figure aspect ratios (for sizing reference):
+%%   CA county/tract maps: ~0.80-0.93 (portrait) -- height-constrained
+%%   Event study figures:  ~1.58-1.62 (landscape) -- width-constrained
+%%   ev_panel_coefs:       1.80 (landscape)
+%%   pca_scree:            1.75 (landscape)
 
 \documentclass[aspectratio=169,t]{beamer}
 
-% ── Theme ──────────────────────────────────────────────────────────────────────
+% -- Theme ---------------------------------------------------------------------
 \usetheme{Madrid}
 \usecolortheme{default}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{footline}[frame number]
 \setbeamerfont{frametitle}{size=\large, series=\bfseries}
 
-% ── Packages ───────────────────────────────────────────────────────────────────
+% -- Packages ------------------------------------------------------------------
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{xcolor}
 \usepackage{hyperref}
-\usepackage{appendixnumberbeamer}  % resets frame counter at \appendix
+\usepackage{appendixnumberbeamer}
 \usepackage{multicol}
 \usepackage[T1]{fontenc}
 
-% ── Colors ─────────────────────────────────────────────────────────────────────
+% -- Colors --------------------------------------------------------------------
 \definecolor{calblue}{RGB}{0,50,135}
 \definecolor{calgold}{RGB}{255,179,16}
 \definecolor{elonred}{RGB}{200,30,30}
@@ -38,8 +44,8 @@
 \setbeamercolor{title}{fg=calblue}
 \setbeamercolor{block title}{bg=calblue!15, fg=calblue}
 
-% ── Convenience commands ────────────────────────────────────────────────────────
-\newcommand{\sig}[1]{\textbf{#1}}          % significant coefficient
+% -- Convenience commands ------------------------------------------------------
+\newcommand{\sig}[1]{\textbf{#1}}
 \newcommand{\src}[1]{\footnotesize\textcolor{gray}{#1}}
 \newcommand{\missingfig}[1]{%
   \fbox{\parbox[c][3cm][c]{0.9\textwidth}{\centering
@@ -47,12 +53,11 @@
     \textcolor{gray}{\small Run \texttt{scripts/12\_component\_maps.py} to generate.}}}
 }
 
-% ── Title block ────────────────────────────────────────────────────────────────
-\title[Hummers or Hybrids, 2025]{%
-  Hummers or Hybrids, 2025 Edition:\\
+% -- Title block ---------------------------------------------------------------
+\title[Hummers or Hybrids, 2025 Edition]{%
+  Hummers or Hybrids, 2025 Edition:\\[0.3em]
   Climate Ideology, EV Ownership, and the Elon Effect}
-\subtitle{An experiment in a purely prompted collaboration:\\
-  \textit{If it got any of it correct we are in such big trouble}}
+\subtitle{A replication and extension of Kahn (2007)}
 \author[Vaughn \& Morehouse]{%
   Ryan Vaughn \and John Morehouse\\[0.5em]
   {\small\textit{With assistance from Claude (Anthropic)}}\\
@@ -62,139 +67,165 @@
 \institute{\href{https://github.com/rkvaughn/hummers-or-hybrids}%
   {\texttt{github.com/rkvaughn/hummers-or-hybrids}}}
 
-% ══════════════════════════════════════════════════════════════════════════════
+% =============================================================================
 \begin{document}
-% ══════════════════════════════════════════════════════════════════════════════
+% =============================================================================
 
-\begin{frame}
+% Title slide -- [plain] removes the empty header navigation bar
+% so \titlepage fills the frame and the paper title is displayed prominently
+\begin{frame}[plain,noframenumbering]
   \titlepage
 \end{frame}
 
-% ── Section 1: Motivation ──────────────────────────────────────────────────────
-\section{Motivation}
+% -- Section 1: Executive Summary ---------------------------------------------
+\section{Overview}
 
-\begin{frame}{The Original Question: Kahn (2007)}
+\begin{frame}{Project Motivation}
   \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      \textbf{``Do Greens Drive Hummers or Hybrids?''}\\
-      \textit{Journal of Environmental Economics and Management}, 53(2), 2007
-
-      \vspace{0.8em}
-      \textbf{Setup:}
+    \begin{column}{0.52\textwidth}
+      \small
+      \textbf{Kahn (2007) established a clean empirical fact:}
       \begin{itemize}
-        \item Green Party registration share (CA, 2000) as ideology proxy
-        \item Unit of analysis: zip codes / Census tracts, \textbf{LA County only}
-        \item Data: 2000 Census, 2001 NHTS, 2005 RL Polk vehicle registrations
-        \item Methods: OLS, Negative Binomial regression
+        \item Green Party registration predicts hybrid ownership, lower gas use,
+              and transit commuting --- even controlling for income and education
+        \item Environmental ideology shows up in revealed transportation choices
+              at the community level, not just in surveys
       \end{itemize}
-
-      \vspace{0.8em}
-      \textbf{Core findings:}
+      \textbf{18 years later, things have changed:}
       \begin{itemize}
-        \item[$\uparrow$] Transit use \hfill [$+$, sig.]
-        \item[$\downarrow$] Gasoline consumption \hfill [$-$, sig.]
-        \item[$\uparrow$] Prius ownership \hfill [$+$, sig.]
-        \item[$\downarrow$] Hummer ownership \hfill [$-$, sig.]
+        \item The Prius has given way to Tesla as the dominant green status vehicle
+        \item Non-Tesla EVs now span a wide range of price points
+        \item \textbf{Tesla is Elon Musk's} --- a question Kahn never had to ask
       \end{itemize}
     \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{block}{The Key Insight}
-        Environmental ideology is not just
-        stated — it manifests in revealed
-        transportation behavior at the
-        community level.
+    \begin{column}{0.45\textwidth}
+      \begin{block}{The questions we ask}
+        \begin{enumerate}\small
+          \item Does climate ideology still predict green transportation in 2023 CA?
+          \item How does Tesla compare to non-Tesla EVs?
+          \item \textbf{The Elon Effect:} has the ideology--Tesla link shifted post-Musk?
+        \end{enumerate}
       \end{block}
-      \vspace{1em}
-      \begin{alertblock}{Eighteen years later...}
-        The Prius era is over.
-        Tesla is the new green status symbol.
-        And Tesla is run by Elon Musk.
-      \end{alertblock}
+      \begin{block}{Why it matters}
+        \small If brand politics decouple green consumers from the leading EV
+        maker, who fills the gap? Implications for EV diffusion, climate policy,
+        and the limits of consumer activism.
+      \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Our Extensions}
+\begin{frame}{How AI Was Used in This Project}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      Both authors used \textbf{Claude Code} (Anthropic) as a collaborative
+      research partner --- each committing independently to the shared GitHub repo.
+      \vspace{0.6em}
+
+      \small
+      \begin{tabular}{ll}
+        \toprule
+        \textbf{Pipeline stage} & \textbf{AI contribution} \\
+        \midrule
+        Data acquisition     & API calls, parsing, cleaning \\
+        Crosswalk construction & Spatial overlay design \\
+        PCA index            & Variable selection, validation \\
+        Panel regressions    & Model specification \\
+        Event study          & Identification strategy \\
+        Methodological fix   & FD spec for stock/flow issue \\
+        Figures \& tables    & Generation and formatting \\
+        Manuscript           & Structure and drafting \\
+        Peer review response & Author reply \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{What made this unusual}
+        \small Each author ran an independent Claude Code instance and committed
+        directly to the shared repo. The full pipeline --- raw data through peer
+        review response --- was built through iterative human--AI collaboration.
+      \end{block}
+      \vspace{0.4em}
+      \begin{block}{Codebase}
+        \small 12 numbered Python scripts\\
+        (01 acquire $\to$ 11 spatial $\to$ 12 maps)\\[0.2em]
+        Full pipeline reproducible:\\
+        raw data $\to$ figures $\to$ draft $\to$ peer review
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Key Findings}
+  \begin{enumerate}
+    \item \textbf{Kahn's finding survives.} Climate ideology predicts lower-carbon commuting
+    (+1.09 pp transit, $-$1.84 pp drive-alone) and higher EV ownership (+5.0\% Tesla,
+    +6.1\% non-Tesla) in 2023 California.
+
+    \vspace{0.3em}
+    \item \textbf{Non-Tesla EVs have democratized.} The ideology--non-Tesla link weakened
+    2020--2022 as affordable models spread into lower-ideology communities. By 2023--2024
+    the link largely recovered --- EVs are diffusing across the ideology spectrum.
+
+    \vspace{0.3em}
+    \item \textbf{The Elon Effect: present, but not yet cleanly identified.}
+    \begin{itemize}\small
+      \item Stock-based event study: no decline through 2024 --- but methodologically fragile
+            (CEC data are accumulated stock, not new sales)
+      \item \textbf{First-difference results:} high-ideology tracts have added fewer Teslas per
+            year since 2019, while non-Tesla BEVs recover after 2021
+      \item The slowdown predates Musk's Twitter acquisition --- saturation and competition
+            are confounded with any brand-politics effect
+    \end{itemize}
+
+    \vspace{0.3em}
+    \item \textbf{Spatial autocorrelation is strong but results hold.}
+    Moran's I = 0.58; SAR $\hat{\rho}$ = 0.78; ideology coefficients survive spatial correction.
+  \end{enumerate}
+\end{frame}
+
+% -- Section 2: Background & Methods ------------------------------------------
+\section{Background \& Methods}
+
+\begin{frame}{The Original Question and Our Extensions}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
+      \footnotesize
+      \textbf{Kahn (2007): ``Do Greens Drive Hummers or Hybrids?''}\\
+      \textit{JEEM}, 53(2), 2007
+      \begin{itemize}
+        \item Green Party registration share (CA, 2000) as ideology proxy
+        \item Unit: zip codes / tracts, LA County only
+        \item Results: more transit, less gasoline, more Priuses, fewer Hummers
+      \end{itemize}
       \textbf{What we keep:}
       \begin{itemize}
-        \item Same core question — does ideology predict green behavior?
-        \item OLS commute regressions
-        \item Negative binomial EV count models
-        \item California focus
-      \end{itemize}
-
-      \vspace{1em}
-      \textbf{What we update:}
-      \begin{itemize}
-        \item \textbf{Geography:} Statewide (all CA), not LA only
-        \item \textbf{Ideology:} Climate belief composite (PCA) vs.\ Green Party share
-        \item \textbf{Outcome:} EV ownership (Tesla vs.\ non-Tesla) vs.\ hybrids
-        \item \textbf{Data:} 2018--2024 panel vs.\ single cross-section
+        \item Same core question; OLS commute regressions
+        \item Log-OLS EV count models; California focus
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
+      \footnotesize
+      \textbf{What we update:}
+      \begin{itemize}
+        \item \textbf{Geography:} Statewide CA, not LA only
+        \item \textbf{Ideology:} Climate belief PCA composite
+              vs.\ Green Party share
+        \item \textbf{Outcome:} EV ownership (Tesla vs.\ non-Tesla)
+        \item \textbf{Data:} 2018--2024 panel vs.\ single cross-section
+      \end{itemize}
       \textbf{New questions:}
       \begin{enumerate}
-        \item Does climate ideology still predict green transportation in 2023?
-        \item Does it predict \textit{EV} ownership, and how does Tesla compare to non-Tesla brands?
-        \item \textbf{The Elon Effect:} Has the ideology--Tesla link changed following Musk's political turn?
-        \item What are the distributional patterns of the non-Tesla EV market?
+        \item Does ideology still predict green transportation in 2023?
+        \item Does it predict EV ownership? Tesla vs.\ non-Tesla?
+        \item \textbf{The Elon Effect:} has the ideology--Tesla link shifted?
       \end{enumerate}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Project Design: Claude-Assisted Research}
-  \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      \textbf{Novel workflow:} Both authors used \textbf{Claude Code} (Anthropic)
-      as a collaborative AI partner throughout the project.
-
-      \vspace{0.8em}
-      \begin{tabular}{ll}
-        \toprule
-        \textbf{Stage} & \textbf{AI contribution} \\
-        \midrule
-        Data acquisition & API calls, parsing, cleaning \\
-        Crosswalk construction & Spatial overlay design \\
-        PCA index & Variable selection, validation \\
-        Panel regressions & Model specification \\
-        Event study & Identification strategy \\
-        Figures \& tables & Generation and formatting \\
-        Manuscript & Structure and drafting \\
-        \bottomrule
-      \end{tabular}
-
-      \vspace{0.8em}
-      \src{Each author's Claude instance committed to the shared GitHub
-      repository independently; the codebase reflects genuine
-      human--AI collaboration at scale.}
-    \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{block}{Replication prompt}
-        \small\textit{``Replicate Kahn (2007) with modern data.
-        Reframe ideology around climate beliefs rather than party
-        affiliation. Extend into the EV era. Test whether the
-        ideology--Tesla link has shifted following Elon Musk's
-        political evolution.''}
-      \end{block}
-      \vspace{0.5em}
-      \begin{block}{Codebase}
-        \small 12 numbered Python scripts\\
-        (01 acquire $\to$ 11 spatial)\\
-        Full pipeline: raw data $\to$ figures $\to$ draft
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% ── Section 2: Data ────────────────────────────────────────────────────────────
-\section{Data \& Methods}
-
 \begin{frame}{Data Overview}
-  \centering
+  \centering\footnotesize
   \begin{tabular}{llll}
     \toprule
     \textbf{Source} & \textbf{Variables} & \textbf{Geography} & \textbf{Years} \\
@@ -202,28 +233,26 @@
     CA Energy Commission (CEC) & ZEV counts by make/type & ZIP code & 2018--2024 \\
     ACS 5-Year Estimates & Income, education, commute & Census tract & 2019--2023 \\
     Yale Climate Opinion Maps & 5 climate belief measures & County (58) & 2023 \\
-    CA Secretary of State & Voter registration by party & Precinct & 2022 \\
-    CA SoS / SWDB & Prop 30 \& 68 vote share & Precinct & 2022, 2018 \\
+    CA Secretary of State & Voter reg.\ + ballot vote share & Precinct & 2018, 2022 \\
     TIGER/Line & Census tract shapefiles & Tract & 2020 \\
-    UC Berkeley SWDB & Precinct shapefiles (g22, p18) & Precinct & 2022, 2018 \\
+    UC Berkeley SWDB & Precinct shapefiles (g22, p18) & Precinct & 2018, 2022 \\
     \bottomrule
   \end{tabular}
 
-  \vspace{1em}
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Vehicle categories:}
-      \begin{itemize}\small
+    \begin{column}{0.50\textwidth}
+      \footnotesize\textbf{Vehicle categories:}
+      \begin{itemize}
         \item Tesla BEVs (Model 3/Y/S/X, Cybertruck)
         \item Non-Tesla BEVs (Bolt, Leaf, Ioniq, Rivian \ldots)
         \item Light trucks / ICE SUVs (modern Hummer proxy)
       \end{itemize}
     \end{column}
-    \begin{column}{0.48\textwidth}
-      \textbf{Scope:} All California Census tracts\\
-      ($\approx$9,000 tracts $\times$ 7 years = 63,000 obs.)\\[0.5em]
-      \textbf{Ideology resolution:} County (all components)\\
-      assigned uniformly to constituent tracts
+    \begin{column}{0.47\textwidth}
+      \footnotesize\textbf{Scope:} All CA Census tracts
+      ($\approx$9,000 tracts $\times$ 7 years = 63,000 obs.)
+      \textbf{Note:} CEC files are Dec.\ 31 \textit{stock} snapshots,
+      not new sales --- central to the event study.
     \end{column}
   \end{columns}
 \end{frame}
@@ -231,37 +260,39 @@
 \begin{frame}{Data Acquisition Pipeline (Scripts 01--04)}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{Script 01 — CEC ZEV data:}
+      \textbf{Script 01 --- CEC ZEV data:}
       \begin{itemize}\small
-        \item Downloaded annual snapshots 2018--2024 from \texttt{energy.ca.gov}
-        \item Parsed make/model into: Tesla BEV, non-Tesla BEV, PHEV, light truck
-        \item Stacked into \texttt{cec\_panel\_zev.csv}: zip $\times$ year $\times$ vehicle type
+        \item Annual snapshots 2018--2024 from \texttt{energy.ca.gov}
+        \item Parsed into: Tesla BEV, non-Tesla BEV, PHEV, light truck
       \end{itemize}
 
-      \vspace{0.5em}
-      \textbf{Script 02 — ACS:}
+      \vspace{0.1em}
+      \textbf{Script 02 --- ACS:}
       \begin{itemize}\small
-        \item Census API via \texttt{requests}; 2023 5-year estimates
-        \item Key variables: median HH income, \% BA+, commute mode shares, race/ethnicity, WFH
+        \item Census API; 2023 5-year estimates
+        \item Key: median HH income, \% BA+, commute shares, WFH
       \end{itemize}
 
-      \vspace{0.5em}
-      \textbf{Script 03 — Ideology inputs:}
+      \vspace{0.1em}
+      \textbf{Script 03 --- Ideology inputs:}
       \begin{itemize}\small
         \item YCOM county CSVs from Yale CCCAM
         \item CA SoS voter registration \& ballot SOV via UC Berkeley SWDB
       \end{itemize}
     \end{column}
     \begin{column}{0.45\textwidth}
-      \begin{block}{Script 04 — Crosswalks (4 tables)}
+      \begin{block}{Script 04 --- Crosswalks (4 tables)}
         \begin{enumerate}\small
-          \item ZIP $\to$ Tract: Census ZCTA-to-tract relationship file; area-proportional weights
-          \item Precinct $\to$ Tract (g22): \texttt{geopandas} spatial overlay; EPSG:3310; weight = intersection area / precinct area
+          \item ZIP $\to$ Tract: Census ZCTA-to-tract rel.\ file;
+                area-proportional weights
+          \item Precinct $\to$ Tract (g22): \texttt{geopandas} spatial overlay;
+                EPSG:3310
           \item Precinct $\to$ Tract (p18): same, 2018 precincts
-          \item County $\to$ Tract: FIPS prefix lookup from ACS
+          \item County $\to$ Tract: FIPS prefix lookup
         \end{enumerate}
       \end{block}
-      \src{All crosswalk weights re-normalized per source unit to sum to 1.0; slivers ($<$0.001\%) dropped.}
+      \src{Weights re-normalized per source unit to sum to 1.0;
+      slivers ($<$0.001\%) dropped.}
     \end{column}
   \end{columns}
 \end{frame}
@@ -269,49 +300,48 @@
 \begin{frame}{Geographic Crosswalk Strategy}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
-      \textbf{Problem:} Three geographic systems, one target unit (Census tract):
+      \footnotesize\textbf{Problem:} Three geographic systems, one target unit:
 
-      \vspace{0.5em}
-      \begin{tabular}{ll}
+      \vspace{0.1em}
+      \begin{tabular}{p{1.6cm}p{4cm}}
         \toprule
         \textbf{Source} & \textbf{Method} \\
         \midrule
-        ZIP codes & Area-proportional weights \\
-                  & (Census rel.\ file) \\[0.3em]
-        Precincts & Spatial overlay \\
-                  & (\texttt{gpd.overlay()}, EPSG:3310) \\[0.3em]
-        Counties & FIPS prefix \\
-                 & (direct lookup) \\
+        ZIP codes & Area-proportional weights (Census rel.\ file) \\
+        Precincts & Spatial overlay (\texttt{gpd.overlay()}, EPSG:3310) \\
+        Counties  & FIPS prefix (direct lookup) \\
         \bottomrule
       \end{tabular}
 
-      \vspace{0.8em}
-      \textbf{All ideology components} ended up at county resolution due to SWDB precinct key incompatibility with Census MPREC system. County values assigned uniformly to constituent tracts.
-
+      \vspace{0.1em}
+      \textbf{Outcome:} All ideology components landed at county resolution
+      (SWDB precinct key incompatibility with Census MPREC).
+      County values assigned uniformly to constituent tracts.
     \end{column}
     \begin{column}{0.47\textwidth}
       \begin{block}{Key implementation notes}
         \begin{itemize}\small
-          \item CRS: EPSG:3310 (CA Albers Equal Area) for accurate area computation throughout
-          \item ZCTA rel.\ file: plain \texttt{.txt} download (not zipped) from Census
+          \item CRS: EPSG:3310 (CA Albers Equal Area)
+          \item ZCTA rel.\ file: plain \texttt{.txt} (not zipped) from Census
           \item Precinct key: g22 uses \texttt{PREC\_KEY}; p18 uses \texttt{MPREC\_KEY}
-          \item Boundary slivers (weight $<10^{-5}$) dropped after overlay
-          \item Weight sums checked per source unit: $>$99\% within 1\% of 1.0
+          \item Slivers (weight $<10^{-5}$) dropped after overlay
+          \item Weight sums: $>$99\% within 1\% of 1.0
         \end{itemize}
       \end{block}
-      \vspace{0.3em}
+      \vspace{0.1em}
       \textbf{Output:} 4 crosswalk CSVs in \texttt{data/processed/}\\
       (14,605 + 111,020 + 107,650 + 9,129 rows)
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Ideology Construct: Climate Ideology Index}
+\begin{frame}{Ideology Construct: Climate Ideology Index (Script 06)}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
-      \textbf{PCA across 8 variables (Script 06):}
+      \textbf{PCA across 8 variables:}
 
-      \vspace{0.5em}
+      \vspace{0.1em}
+      \small
       \begin{tabular}{lll}
         \toprule
         \textbf{Variable} & \textbf{Source} & \textbf{Geo} \\
@@ -327,102 +357,114 @@
         \bottomrule
       \end{tabular}
 
-      \vspace{0.5em}
+      \vspace{0.1em}
+      \normalsize
       All variables standardized before PCA.\\
       PC1 sign-normalized: $+$ = more climate-concerned.
     \end{column}
     \begin{column}{0.47\textwidth}
       \begin{block}{PCA result}
         \textbf{PC1 explains 84.7\% of variance.}\\
-        PC1+PC2 cumulative: 90.1\%\\[0.5em]
-        All 8 components load uniformly positive on PC1 (loadings: 0.33--0.37), confirming a single latent ``climate liberalism'' dimension.
+        PC1+PC2 cumulative: 90.1\%\\[0.2em]
+        All 8 components load uniformly positive on PC1
+        (loadings: 0.33--0.37), confirming a single latent
+        ``climate liberalism'' dimension.
       \end{block}
-      \vspace{0.5em}
-      \includegraphics[width=\textwidth]{../output/figures/pca_scree.png}
+      \vspace{0.1em}
+      \includegraphics[width=\columnwidth,height=0.40\textheight,keepaspectratio]{../output/figures/pca_scree.png}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Composite Climate Ideology Index Across California}
+% Map: ideology_map.png is portrait (2400x3000, ratio 0.80).
+% Height constraint ensures all of CA is visible on the slide.
+\begin{frame}{Climate Ideology Index Across California}
   \begin{center}
-    \includegraphics[width=0.82\textwidth]{../output/figures/ideology_map.png}
+    \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/ideology_map.png}
   \end{center}
-  \vspace{-0.3em}
-  \src{Climate Ideology Index (PC1, standardized) by Census tract/county. Bay Area, LA, and coastal urban corridors score highest; Central Valley and inland areas score lowest.}
+  \vspace{-0.5em}
+  \src{Climate Ideology Index (PC1, standardized) by Census tract.
+  Bay Area, LA, and coastal corridors score highest;
+  Central Valley and inland areas score lowest.}
 \end{frame}
 
 \begin{frame}{Identification Strategy}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{Cross-section (Script 07):}
-      \begin{itemize}
+      \begin{itemize}\small
         \item OLS: commute behavior $\sim$ ideology + controls
         \item Log-OLS: $\log(\text{BEV}+1)$ $\sim$ ideology + controls
         \item 2023 ACS vintage; HC3 robust SEs
         \item N = 9,003 CA Census tracts
       \end{itemize}
 
-      \vspace{0.8em}
+      \vspace{0.1em}
       \textbf{Panel (Script 08):}
-      \begin{itemize}
+      \begin{itemize}\small
         \item Tract $\times$ year panel, 2018--2024
         \item Year FE absorbs secular EV trends
-        \item \textit{Note:} full two-way FE infeasible — ideology is time-invariant; tract FE would absorb it entirely
-        \item Ideology identified from cross-sectional variation
+        \item Full two-way FE infeasible --- ideology is time-invariant
         \item Tract-clustered SEs
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{Event study (Script 09):}
-      \begin{itemize}
+      \textbf{Event study (Scripts 09 \& 09b):}
+      \begin{itemize}\small
         \item Within-tract demeaning (FWL) absorbs tract FE
-        \item Ideology $\times$ year interactions estimated relative to 2018 baseline
-        \item Events of interest:
-          \begin{itemize}
-            \item Oct 2022: Musk acquires Twitter
-            \item Nov 2024: DOGE / Trump role
+        \item Ideology $\times$ year interactions relative to base year
+        \item Two specifications:
+          \begin{itemize}\small
+            \item \textit{Stock-based} (Script 09): $\log(\text{EV}+1)$
+            \item \textit{FD} (Script 09b): $\Delta\log(\text{EV}+1)$
           \end{itemize}
-        \item Balanced panel: all 7 years, 9,003 tracts
-        \item Non-Tesla BEVs as within-time placebo
+        \item Non-Tesla BEVs as placebo
+        \item County-clustered SEs
       \end{itemize}
-      \vspace{0.5em}
+      \vspace{0.1em}
       \begin{alertblock}{Ecological inference}
-        Unit of analysis is the Census tract, not the individual. We observe community-level correlations, not household decisions.
+        \small Unit of analysis is the Census tract. We observe
+        community-level patterns, not individual decisions.
       \end{alertblock}
     \end{column}
   \end{columns}
 \end{frame}
 
-% ── Section 3: Results ─────────────────────────────────────────────────────────
+% -- Section 3: Results -------------------------------------------------------
 \section{Results}
 
 \begin{frame}{Kahn (2007) vs.\ 2025: Side-by-Side}
   \begin{center}
-  \begin{tabular}{llcc}
+  \scalebox{0.82}{%
+  \small
+  \begin{tabular}{p{4.5cm}cc}
     \toprule
-    & & \textbf{Kahn (2007)} & \textbf{Vaughn \& Morehouse (2025)} \\
+    & \textbf{Kahn (2007)} & \textbf{Vaughn \& Morehouse (2025)} \\
     \midrule
-    \textbf{Ideology proxy} & & Green Party share & Climate Ideology Index (PCA) \\
-    \textbf{Geography} & & LA County & Statewide CA \\
-    \textbf{Period} & & 2000--2005 & 2018--2024 \\
-    \textbf{Method} & & OLS + Neg.\ Binomial & OLS + Year-FE panel \\
+    Ideology proxy & Green Party share & Climate Ideology Index (PCA) \\
+    Geography & LA County & Statewide CA \\
+    Period & 2000--2005 & 2018--2024 \\
+    Method & OLS + Neg.\ Binomial & OLS + Year-FE panel \\
     \midrule
-    \multicolumn{4}{l}{\textit{Commute behavior:}} \\
-    \quad Transit share & & $\uparrow$ sig. & $\uparrow$ +1.09 pp*** \\
-    \quad Drive-alone share & & $\downarrow$ sig. & $\downarrow$ $-$1.84 pp*** \\
-    \quad Gasoline consumption & & $\downarrow$ sig. & \textit{(not estimated)} \\
+    \multicolumn{3}{l}{\textit{Commute behavior:}} \\
+    \quad Transit share & $\uparrow$ sig. & $\uparrow$ +1.09 pp*** \\
+    \quad Drive-alone share & $\downarrow$ sig. & $\downarrow$ $-$1.84 pp*** \\
+    \quad Gasoline consumption & $\downarrow$ sig. & \textit{(not estimated)} \\
     \midrule
-    \multicolumn{4}{l}{\textit{Vehicle ownership:}} \\
-    \quad Green vehicle (Prius/Tesla) & & $\uparrow$ sig. & $\uparrow$ +5.0\%*** \\
-    \quad Non-Tesla EV & & \textit{(pre-EV era)} & $\uparrow$ +6.1\%*** \\
-    \quad High-emissions vehicle & & $\downarrow$ sig. & $\downarrow$ $-$2.3\%*** \\
+    \multicolumn{3}{l}{\textit{Vehicle ownership:}} \\
+    \quad Green vehicle (Prius/Tesla) & $\uparrow$ sig. & $\uparrow$ +5.0\%*** \\
+    \quad Non-Tesla EV & \textit{(pre-EV era)} & $\uparrow$ +6.1\%*** \\
+    \quad High-emissions vehicle & $\downarrow$ sig. & $\downarrow$ $-$2.3\%*** \\
     \midrule
-    \multicolumn{4}{l}{\textit{New finding:}} \\
-    \quad Elon Effect (post-2022) & & \textit{(n/a)} & \textbf{Not detected through 2024} \\
+    \multicolumn{3}{l}{\textit{New (Elon Effect):}} \\
+    \quad Stock-based event study & \textit{(n/a)} & Flat --- no detectable decline \\
+    \quad First-difference (net new) & \textit{(n/a)} & $\downarrow$ Slowing since 2019 \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }% end scalebox
   \end{center}
-  \src{Kahn direction/significance from Kahn (2007) Tables 4--6. Our coefficients: per SD of Climate Ideology Index. *** p$<$0.01.}
+  \vspace{0.1em}
+  \src{Kahn direction/significance from Tables 4--6. Our coefficients: per SD of Climate Ideology Index. *** p$<$0.01.}
 \end{frame}
 
 \begin{frame}{Replication: Commute Behavior (Cross-Section, 2023)}
@@ -431,7 +473,7 @@
       \textbf{Transit commute share}\\
       \src{OLS, HC3 robust SEs, N=9,003 tracts}
 
-      \vspace{0.4em}
+      \vspace{0.3em}
       \begin{tabular}{lcc}
         \toprule
         \textbf{Variable} & \textbf{Coef} & \textbf{SE} \\
@@ -451,7 +493,7 @@
       \textbf{Drive-alone commute share}\\
       \src{OLS, HC3 robust SEs, N=9,003 tracts}
 
-      \vspace{0.4em}
+      \vspace{0.3em}
       \begin{tabular}{lcc}
         \toprule
         \textbf{Variable} & \textbf{Coef} & \textbf{SE} \\
@@ -468,14 +510,15 @@
       \end{tabular}
     \end{column}
   \end{columns}
-  \vspace{0.5em}
+  \vspace{0.4em}
   \textbf{Interpretation:} 1 SD $\uparrow$ ideology $\Rightarrow$ +1.09 pp transit, $-$1.84 pp drive-alone.
-  Given average shares of $\approx$5\% transit and $\approx$76\% drive-alone, these are economically meaningful.
+  Economically meaningful relative to averages of $\approx$5\% and $\approx$76\%.
 \end{frame}
 
 \begin{frame}{EV Panel Results (2018--2024)}
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.50\textwidth}
+      \small
       \begin{tabular}{lccc}
         \toprule
         \textbf{Outcome} & \textbf{Coef} & \textbf{SE} & \textbf{$R^2$} \\
@@ -486,88 +529,156 @@
         Tesla share of BEVs & +0.0022*** & (0.0008) & 0.521 \\
         \bottomrule
       \end{tabular}
-      \src{Year FE, tract-clustered SEs. N=63,021 (9,003 tracts $\times$ 7 years).\\
+      \normalsize
+      \src{Year FE, tract-clustered SEs. N=63,021 (9,003 tracts $\times$ 7 years).
       Controls: log income, \% BA+, pop density, \% white, \% WFH.}
 
-      \vspace{0.5em}
+      \vspace{0.4em}
       \textbf{Key results:}
-      \begin{itemize}
+      \begin{itemize}\small
         \item 1 SD ideology $\Rightarrow$ +5.0\% Teslas, +6.1\% non-Tesla EVs
-        \item High-ideology tracts have \textit{fewer} light trucks ($-$2.3\%)
-        \item High-ideology tracts also have a \textit{higher Tesla share} within the EV fleet
+        \item High-ideology tracts have fewer light trucks ($-$2.3\%)
+        \item Kahn's green vehicle finding translates to the EV era
       \end{itemize}
     \end{column}
-    \begin{column}{0.48\textwidth}
-      \includegraphics[width=\textwidth]{../output/figures/ev_panel_coefs.png}
-      \src{Ideology coefficient by vehicle type, year FE model. 95\% CI from tract-clustered SEs.}
+    \begin{column}{0.47\textwidth}
+      \includegraphics[width=\columnwidth]{../output/figures/ev_panel_coefs.png}
+      \src{Ideology coefficient by vehicle type, year FE model.
+      95\% CI from tract-clustered SEs.}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{The Elon Effect}
+% -- Section 4: The Elon Effect -----------------------------------------------
+\section{The Elon Effect}
+
+\begin{frame}{The Elon Effect: Original Stock-Based Event Study}
   \begin{center}
-    \includegraphics[width=0.82\textwidth]{../output/figures/event_study_tesla_vs_nontesla.png}
+    \includegraphics[width=0.84\textwidth,height=0.70\textheight,keepaspectratio]{../output/figures/event_study_tesla_vs_nontesla.png}
   \end{center}
   \vspace{-0.4em}
-  \src{Ideology $\times$ year interaction coefficients relative to 2018. Within-tract demeaned OLS; tract-clustered SEs; 95\% CI shaded.
-  Vertical dotted lines: Musk Twitter acquisition (Oct 2022) and DOGE/Trump role (Nov 2024).}
+  \src{Ideology $\times$ year coefficients relative to 2018 base year. Outcome: $\log(\text{EV stock}+1)$.
+  Tract-clustered SEs; 95\% CI shaded. Vertical lines: Twitter acquisition (Oct 2022) and DOGE/Trump role (Nov 2024).}
 \end{frame}
 
-\begin{frame}{The Elon Effect: Interpretation}
+\begin{frame}{A Methodological Issue: Stock vs.\ Flow}
   \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      \textbf{What the event study shows:}
+    \begin{column}{0.60\textwidth}
+      \small
+      \textbf{The problem.}
+      CEC data are December 31 \textit{stock} snapshots --- not new sales.
+      A Tesla purchased in 2017 still appears in the 2024 file.
 
-      \vspace{0.5em}
-      \textcolor{elonred}{\textbf{Tesla (red):}}
-      \begin{itemize}
-        \item Ideology--Tesla link \textit{strengthened} 2018$\to$2020 (+0.025 to +0.030)
-        \item Held broadly \textit{flat} through 2024 (+0.022 to +0.030)
-        \item \textbf{No clear post-2022 decline}
-      \end{itemize}
+      \vspace{0.2em}
+      With roughly 18\% annual EV fleet turnover, only about
+      \textbf{33\% of the 2024 Tesla stock} reflects post-October 2022
+      purchases. Even a real slowdown in high-ideology tracts would move
+      the stock by a few percent --- within noise.
 
-      \vspace{0.5em}
-      \textcolor{evblue}{\textbf{Non-Tesla BEV (blue):}}
-      \begin{itemize}
-        \item Rose in 2019 (+0.014), then \textit{fell below baseline} 2021--2022 ($-$0.008 to $-$0.009)
-        \item Recovered by 2023--2024
-        \item Interpretation: \textbf{market democratization} — Bolt/Leaf/Ioniq spread into lower-ideology communities as prices fell
-      \end{itemize}
+      \vspace{0.2em}
+      \textbf{The fix: first-difference the outcome.}
+      \[
+        \Delta\log(\text{Tesla}+1)_{it} =
+          \log(\text{Tesla}+1)_{it} - \log(\text{Tesla}+1)_{i,t-1}
+      \]
+      This approximates net new registrations
+      (new purchases minus retirements and transfers).
+      Tract FE are absorbed by first-differencing.
     \end{column}
-    \begin{column}{0.42\textwidth}
-      \begin{alertblock}{What this does NOT show}
-        \begin{itemize}
-          \item The most dramatic Musk political events (DOGE, Trump administration) only appear at the \textbf{tail of the 2024 panel}
-          \item The data window is too short to detect a shift that may be emerging now
-          \item 2025 CEC data (not yet available) is needed for a definitive test
-        \end{itemize}
-      \end{alertblock}
-      \vspace{0.5em}
-      \begin{block}{Placebo check}
-        Light truck ideology coefficients move separately and monotonically — not confounded with the EV story.
+    \begin{column}{0.37\textwidth}
+      \begin{block}{The stock spec is not wrong for all purposes}
+        \small Cross-section and panel regressions (``do greener tracts have
+        more EVs?'') use stock correctly. The issue is specific to the
+        \textit{event study}, which needs to detect changes in purchasing
+        behavior.
+      \end{block}
+      \vspace{0.4em}
+      \begin{block}{One mitigating observation}
+        \small The non-Tesla BEV series dips in 2021--2022 in the stock
+        event study, showing the spec is sensitive to some rate changes.
+        It is attenuated, not completely blind.
       \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
-% ── Section 4: Conclusions ─────────────────────────────────────────────────────
+\begin{frame}{The Elon Effect: First-Difference Results (Script 09b)}
+  \begin{center}
+    \includegraphics[width=0.84\textwidth,height=0.70\textheight,keepaspectratio]{../output/figures/event_study_fd_tesla_vs_nontesla.png}
+  \end{center}
+  \vspace{-0.4em}
+  \src{Ideology $\times$ year coefficients for $\Delta\log(\text{EV}+1)$; base year 2019.
+  Inner CI: tract-clustered. Outer CI: county-clustered (more conservative).
+  Vertical lines: Twitter acquisition (Oct 2022) and DOGE/Trump role (Nov 2024).}
+\end{frame}
+
+\begin{frame}{The Elon Effect: Revised Interpretation}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \small
+      \textbf{\textcolor{elonred}{Tesla (red):}} Negative in all post-2019 years
+      ($-$0.017 to $-$0.032 per SD ideology).
+      High-ideology tracts add fewer net new Teslas each year. Robust to county clustering.
+
+      \vspace{0.15em}
+      \textbf{\textcolor{evblue}{Non-Tesla BEV (blue):}} Negative early
+      ($\approx$$-$0.025 in 2020), converges toward zero by 2023,
+      diverging from Tesla after 2021.
+
+      \vspace{0.15em}
+      \textbf{The complication:} Tesla slowdown begins \textbf{2020} ---
+      two years pre-Twitter acquisition. A clean Elon Effect attribution
+      requires monthly new-sales data.
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{Three candidate explanations}
+        \begin{enumerate}\small
+          \item \textbf{Saturation:} high-ideology tracts mostly bought
+                Tesla before 2019; growth slowed mechanically
+          \item \textbf{Substitution:} greener buyers shifted to
+                Bolt/Ioniq/Rivian as alternatives matured
+          \item \textbf{Elon Effect:} brand disutility post-2022
+                accelerated an existing trend
+        \end{enumerate}
+      \end{block}
+      \vspace{0.05em}
+      \begin{alertblock}{The honest bottom line}
+        \small High-ideology tracts have added Teslas more slowly
+        since 2019. Isolating Musk's politics requires monthly data.
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% -- Section 5: Conclusions ---------------------------------------------------
 \section{Conclusions}
 
 \begin{frame}{Conclusions}
   \begin{enumerate}
-    \item \textbf{Kahn's finding survives into the EV era.} Climate ideology robustly predicts lower-carbon commuting behavior and higher EV ownership in 2023 California. The green signal is alive.
+    \item \textbf{Kahn's finding survives into the EV era.}
+    Climate ideology robustly predicts lower-carbon commuting and higher EV ownership
+    in 2023 California. The green signal is alive.
 
-    \vspace{0.5em}
-    \item \textbf{Non-Tesla EVs are democratizing.} The ideology--non-Tesla-EV link weakened 2020--2022 as affordable models spread beyond high-ideology communities. The technology is outrunning the brand signal.
+    \vspace{0.4em}
+    \item \textbf{Non-Tesla EVs have democratized.}
+    The ideology--non-Tesla link weakened 2020--2022 as affordable models spread
+    beyond high-ideology communities. The technology is outrunning the brand signal.
 
-    \vspace{0.5em}
-    \item \textbf{The Elon Effect is not yet detectable.} The Tesla--ideology link remained stable through 2024. But the data window may be too short: the most consequential Musk political events appear only at the tail of our panel.
+    \vspace{0.4em}
+    \item \textbf{The Elon Effect: suggestive but not yet pinned down.}
+    The stock-based null was methodologically fragile. First-difference results show
+    high-ideology tracts adding fewer Teslas per year since 2019, while non-Tesla
+    BEVs recover. The pattern predates Musk's political turn; 2025 CEC data is
+    needed for a cleaner test.
 
-    \vspace{0.5em}
-    \item \textbf{Spatial autocorrelation is strong but does not reverse results.} Moran's I = 0.58 (transit); SAR $\hat{\rho}$ = 0.78. Ideology coefficients survive spatial correction.
+    \vspace{0.4em}
+    \item \textbf{Spatial autocorrelation is strong but does not reverse results.}
+    Moran's I = 0.58 (transit); SAR $\hat{\rho}$ = 0.78. Ideology coefficients
+    survive spatial correction.
 
-    \vspace{0.5em}
-    \item \textbf{All main results robust} to three alternative ideology specifications (YCOM-only, no-YCOM, Prop 30 alone).
+    \vspace{0.4em}
+    \item \textbf{All main results robust} to three alternative ideology specifications
+    (YCOM-only, no-YCOM, Prop 30 alone).
   \end{enumerate}
 \end{frame}
 
@@ -575,96 +686,103 @@
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{High priority:}
-      \begin{enumerate}
-        \item \textbf{2025 CEC data} — when available, re-run event study with DOGE/Trump window fully in sample; this is the definitive Elon Effect test
-        \item \textbf{AFDC EV charger density} — acquire from DOE AFDC API and add as a control; currently omitted despite being a meaningful EV adoption confounder
-        \item \textbf{Time-varying ACS controls} — use 2019 ACS (2015--2019 5-year, 2010 tract definitions) for 2018--2020 panel years via NHGIS crosswalk; removes time-invariant control assumption
+      \begin{enumerate}\small
+        \item \textbf{2025 CEC data} --- re-run the FD event study with the
+        DOGE/Trump window fully in sample; the definitive Elon Effect test
+        \item \textbf{AFDC EV charger density} --- acquire from DOE AFDC API;
+        ideology may proxy for Supercharger access, biasing coefficients upward
+        \item \textbf{Housing type control} --- add \texttt{pct\_owner\_occupied}
+        (ACS B25003) to absorb the EV charging constraint from multi-unit buildings
+        \item \textbf{Time-varying ACS controls} --- use 2019 ACS vintage for
+        2018--2020 panel years
       \end{enumerate}
     \end{column}
     \begin{column}{0.48\textwidth}
       \textbf{Extensions:}
-      \begin{enumerate}
-        \setcounter{enumi}{3}
-        \item \textbf{National replication} — extend beyond California; requires state-level ideology proxies (YCOM is national) and DMV-equivalent vehicle data
-        \item \textbf{Individual-level data} — address the ecological inference limitation with household-level vehicle or survey data; California NHTS subsample or CA DMV microdata
-        \item \textbf{Brand-level heterogeneity} — decompose non-Tesla EVs by brand (Chevy Bolt vs.\ Rivian vs.\ Hyundai); different price points may have distinct ideology profiles
-        \item \textbf{Publish} — fill GitHub link, post to Substack, submit to NBER EEE working paper series
+      \begin{enumerate}\small
+        \setcounter{enumi}{4}
+        \item \textbf{National replication} --- extend beyond California
+        using YCOM (which is national) and state DMV-equivalent data
+        \item \textbf{Brand-level heterogeneity} --- decompose non-Tesla EVs
+        by brand (Bolt vs.\ Rivian vs.\ Ioniq)
+        \item \textbf{Low-MPG truck filter} --- restrict light trucks to
+        below 20 MPG to sharpen the Hummer comparison
+        \item \textbf{Publish} --- fill GitHub link, post to Substack,
+        submit to NBER EEE working paper series
       \end{enumerate}
     \end{column}
   \end{columns}
 \end{frame}
 
-% ══════════════════════════════════════════════════════════════════════════════
+% =============================================================================
 \appendix
-% ══════════════════════════════════════════════════════════════════════════════
+% =============================================================================
 
 \begin{frame}{Appendix: Contents}
-  \tableofcontents[sectionstyle=show,hideallsubsections]
-  \vspace{0.5em}
   \begin{itemize}
     \item[A1--A2] Robustness checks: alternative ideology specifications
     \item[A3] Spatial diagnostics (Moran's I and SAR)
     \item[A4--A11] Ideology component maps across California
-    \item[A12] Placebo check: light truck event study
+    \item[A12] Placebo check: light truck first-difference event study
   \end{itemize}
 \end{frame}
 
-% ── Appendix A: Robustness ─────────────────────────────────────────────────────
+% -- Appendix A: Robustness ---------------------------------------------------
 
-\begin{frame}{A1: Robustness — Transit Commute Share}
+\begin{frame}{A1: Robustness --- Transit Commute Share}
   \begin{center}
   \begin{tabular}{llcccc}
     \toprule
     \textbf{Spec} & \textbf{Ideology measure} & \textbf{Coef} & \textbf{SE} & \textbf{$R^2$} & \textbf{N} \\
     \midrule
-    Main    & PCA composite (all 8)  & +0.0109*** & (0.0003) & 0.341 & 9,003 \\
-    R1      & YCOM PCA only          & +0.0011    & (0.0023) & 0.503 & 58 \\
-    R2      & Voter reg + ballot PCA & +0.0173*** & (0.0005) & 0.351 & 9,003 \\
-    R3      & Prop 30 share only     & +0.3920*** & (0.0133) & 0.354 & 9,003 \\
+    Main & PCA composite (all 8)  & +0.0109*** & (0.0003) & 0.341 & 9,003 \\
+    R1   & YCOM PCA only          & +0.0011    & (0.0023) & 0.503 & 58 \\
+    R2   & Voter reg + ballot PCA & +0.0173*** & (0.0005) & 0.351 & 9,003 \\
+    R3   & Prop 30 share only     & +0.3920*** & (0.0133) & 0.354 & 9,003 \\
     \bottomrule
   \end{tabular}
   \end{center}
 
-  \vspace{0.5em}
+  \vspace{0.4em}
   \textbf{Notes:}
   \begin{itemize}
-    \item R1 insignificance reflects loss of power at county level (N=58), not reversal of direction
-    \item R2 and R3 are \textit{stronger} than Main — electoral behavior is a particularly tight predictor of commute patterns at tract level
-    \item R1 county controls use unweighted tract means; interpret R1 estimates for heterogeneous counties with caution
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{A2: Robustness — Drive-Alone Commute Share}
-  \begin{center}
-  \begin{tabular}{llcccc}
-    \toprule
-    \textbf{Spec} & \textbf{Ideology measure} & \textbf{Coef} & \textbf{SE} & \textbf{$R^2$} & \textbf{N} \\
-    \midrule
-    Main    & PCA composite (all 8)  & $-$0.0184*** & (0.0006) & 0.594 & 9,003 \\
-    R1      & YCOM PCA only          & $-$0.0078**  & (0.0036) & 0.821 & 58 \\
-    R2      & Voter reg + ballot PCA & $-$0.0288*** & (0.0009) & 0.596 & 9,003 \\
-    R3      & Prop 30 share only     & $-$0.6973*** & (0.0209) & 0.611 & 9,003 \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-
-  \vspace{0.5em}
-  \textbf{Notes:}
-  \begin{itemize}
-    \item R1 significant at 5\% level despite N=58 — county-level YCOM is precise enough to detect the drive-alone effect
+    \item R1 insignificance reflects loss of power at county level (N=58), not a reversal
+    \item R2 and R3 are \textit{stronger} than Main --- electoral behavior is a tight predictor
     \item Direction consistent across all four specifications
-    \item High $R^2$ in R1 (0.821) reflects both ideology strength and collinearity in county-level controls
   \end{itemize}
 \end{frame}
 
-% ── Appendix B: Spatial ───────────────────────────────────────────────────────
+\begin{frame}{A2: Robustness --- Drive-Alone Commute Share}
+  \begin{center}
+  \begin{tabular}{llcccc}
+    \toprule
+    \textbf{Spec} & \textbf{Ideology measure} & \textbf{Coef} & \textbf{SE} & \textbf{$R^2$} & \textbf{N} \\
+    \midrule
+    Main & PCA composite (all 8)  & $-$0.0184*** & (0.0006) & 0.594 & 9,003 \\
+    R1   & YCOM PCA only          & $-$0.0078**  & (0.0036) & 0.821 & 58 \\
+    R2   & Voter reg + ballot PCA & $-$0.0288*** & (0.0009) & 0.596 & 9,003 \\
+    R3   & Prop 30 share only     & $-$0.6973*** & (0.0209) & 0.611 & 9,003 \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+
+  \vspace{0.4em}
+  \textbf{Notes:}
+  \begin{itemize}
+    \item R1 significant at 5\% despite N=58 --- county-level YCOM detects the drive-alone effect
+    \item Direction consistent across all four specifications
+    \item High $R^2$ in R1 (0.821) reflects ideology strength and collinearity in county controls
+  \end{itemize}
+\end{frame}
+
+% -- Appendix B: Spatial ------------------------------------------------------
 
 \begin{frame}{A3: Spatial Diagnostics}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{Moran's I on OLS residuals:}
 
-      \vspace{0.4em}
+      \vspace{0.3em}
       \begin{tabular}{lccc}
         \toprule
         \textbf{Model} & \textbf{I} & \textbf{p} & \textbf{Sig?} \\
@@ -675,10 +793,10 @@
       \end{tabular}
       \src{999 permutations. Queen contiguity weights, 9,003 tracts.}
 
-      \vspace{0.8em}
+      \vspace{0.5em}
       \textbf{SAR model ($\hat{\rho}$):}
 
-      \vspace{0.4em}
+      \vspace{0.3em}
       \begin{tabular}{lcc}
         \toprule
         \textbf{Model} & \textbf{$\hat{\rho}$} & \textbf{SE} \\
@@ -687,139 +805,151 @@
         Drive-alone   & 0.567*** & (0.009) \\
         \bottomrule
       \end{tabular}
-      \src{Spatial Lag Model (SAR), ML estimation, queen contiguity.}
+      \src{SAR, ML estimation, queen contiguity.}
+
+      \vspace{0.4em}
+      \textbf{Conclusion:} Ideology coefficients survive SAR correction.
     \end{column}
     \begin{column}{0.48\textwidth}
-      \includegraphics[width=\textwidth]{../output/figures/residual_map.png}
-      \src{OLS residuals from transit model. Clustered positive residuals in dense corridors confirm spatial autocorrelation.}
-
-      \vspace{0.5em}
-      \textbf{Conclusion:} Strong spatial dependence present — transit access is geographically clustered. Ideology coefficients survive SAR correction.
+      % residual_map.png: 3049x3321, ratio 0.92 (portrait) -- height-constrained
+      \includegraphics[height=0.60\textheight,keepaspectratio]{../output/figures/residual_map.png}
+      \src{OLS residuals, transit model. Clustered positive residuals
+      in dense corridors confirm spatial autocorrelation.}
     \end{column}
   \end{columns}
 \end{frame}
 
-% ── Appendix C: Component Maps ────────────────────────────────────────────────
+% -- Appendix C: Component Maps -----------------------------------------------
+% All component maps: ~2669x2895, ratio ~0.92 (portrait).
+% Height=0.76\textheight,keepaspectratio ensures all of CA is visible.
 
-\begin{frame}{A4--A11: Ideology Component Maps — Overview}
-  All eight ideology components are measured at the \textbf{county level} (N=58 CA counties) due to SWDB precinct key incompatibility with the Census MPREC system.
+\begin{frame}{A4--A11: Ideology Component Maps --- Overview}
+  All eight ideology components are measured at the \textbf{county level} (N=58 CA counties).
 
-  \vspace{0.5em}
-  Maps on the following slides show each component as a county choropleth.\\
-  Generate all maps by running: \texttt{python scripts/12\_component\_maps.py}
-
-  \vspace{0.8em}
+  \vspace{0.4em}
+  \small
   \begin{tabular}{lll}
     \toprule
     \textbf{Slide} & \textbf{Variable} & \textbf{Source} \\
     \midrule
-    A4 & \% Think climate change is happening & YCOM \\
-    A5 & \% Worried about climate change & YCOM \\
-    A6 & \% Say climate change is human-caused & YCOM \\
-    A7 & \% Support regulation & YCOM \\
-    A8 & \% Support Renewable Portfolio Standard & YCOM \\
-    A9 & Democrat $-$ Republican registration share & CA SoS \\
+    A4  & \% Think climate change is happening & YCOM \\
+    A5  & \% Worried about climate change & YCOM \\
+    A6  & \% Say climate change is human-caused & YCOM \\
+    A7  & \% Support regulation & YCOM \\
+    A8  & \% Support Renewable Portfolio Standard & YCOM \\
+    A9  & Democrat $-$ Republican registration share & CA SoS \\
     A10 & Prop 30 YES share (2022, EV/wildfire funding) & CA SoS / SWDB \\
     A11 & Prop 68 YES share (2018, environmental bonds) & CA SoS / SWDB \\
     \bottomrule
   \end{tabular}
 \end{frame}
 
-\begin{frame}{A4: \% Think Climate Change Is Happening (YCOM, County Level)}
+\begin{frame}{A4: \% Think Climate Change Is Happening (YCOM)}
   \begin{center}
     \IfFileExists{../output/figures/map_ycom_happening.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_ycom_happening.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_ycom_happening.png}
     }{%
       \missingfig{map\_ycom\_happening.png}
     }
   \end{center}
-  \src{Yale Climate Opinion Maps (YCOM), 2023. County-level MrP estimates. \% of county residents who agree that climate change is happening.}
+  \vspace{-0.4em}
+  \src{Yale Climate Opinion Maps (YCOM), 2023. County-level MrP estimates.}
 \end{frame}
 
-\begin{frame}{A5: \% Worried About Climate Change (YCOM, County Level)}
+\begin{frame}{A5: \% Worried About Climate Change (YCOM)}
   \begin{center}
     \IfFileExists{../output/figures/map_ycom_worried.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_ycom_worried.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_ycom_worried.png}
     }{%
       \missingfig{map\_ycom\_worried.png}
     }
   \end{center}
+  \vspace{-0.4em}
   \src{Yale Climate Opinion Maps (YCOM), 2023. \% who report being worried about climate change.}
 \end{frame}
 
-\begin{frame}{A6: \% Say Climate Change Is Human-Caused (YCOM, County Level)}
+\begin{frame}{A6: \% Say Climate Change Is Human-Caused (YCOM)}
   \begin{center}
     \IfFileExists{../output/figures/map_ycom_human.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_ycom_human.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_ycom_human.png}
     }{%
       \missingfig{map\_ycom\_human.png}
     }
   \end{center}
-  \src{Yale Climate Opinion Maps (YCOM), 2023. \% who attribute climate change primarily to human activity.}
+  \vspace{-0.4em}
+  \src{Yale Climate Opinion Maps (YCOM), 2023. \% who attribute climate change to human activity.}
 \end{frame}
 
-\begin{frame}{A7: \% Support Climate Regulation (YCOM, County Level)}
+\begin{frame}{A7: \% Support Climate Regulation (YCOM)}
   \begin{center}
     \IfFileExists{../output/figures/map_ycom_regulate.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_ycom_regulate.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_ycom_regulate.png}
     }{%
       \missingfig{map\_ycom\_regulate.png}
     }
   \end{center}
+  \vspace{-0.4em}
   \src{Yale Climate Opinion Maps (YCOM), 2023. \% who support regulating CO\textsubscript{2} as a pollutant.}
 \end{frame}
 
-\begin{frame}{A8: \% Support Renewable Portfolio Standard (YCOM, County Level)}
+\begin{frame}{A8: \% Support Renewable Portfolio Standard (YCOM)}
   \begin{center}
     \IfFileExists{../output/figures/map_ycom_supportRPS.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_ycom_supportRPS.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_ycom_supportRPS.png}
     }{%
       \missingfig{map\_ycom\_supportRPS.png}
     }
   \end{center}
-  \src{Yale Climate Opinion Maps (YCOM), 2023. \% who support requiring utilities to produce electricity from renewable sources.}
+  \vspace{-0.4em}
+  \src{Yale Climate Opinion Maps (YCOM), 2023. \% who support requiring utilities to use renewables.}
 \end{frame}
 
-\begin{frame}{A9: Democrat $-$ Republican Registration Share (County Level)}
+\begin{frame}{A9: Democrat $-$ Republican Registration Share}
   \begin{center}
     \IfFileExists{../output/figures/map_dem_minus_rep.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_dem_minus_rep.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_dem_minus_rep.png}
     }{%
       \missingfig{map\_dem\_minus\_rep.png}
     }
   \end{center}
-  \src{CA Secretary of State voter registration file (g22 vintage). (DEM $-$ REP) / total registered voters per county.}
+  \vspace{-0.4em}
+  \src{CA Secretary of State voter registration (g22 vintage). (DEM $-$ REP) / total registered per county.}
 \end{frame}
 
 \begin{frame}{A10: Prop 30 YES Share (2022, EV Charging / Wildfire Funding)}
   \begin{center}
     \IfFileExists{../output/figures/map_prop30_yes_share.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_prop30_yes_share.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_prop30_yes_share.png}
     }{%
       \missingfig{map\_prop30\_yes\_share.png}
     }
   \end{center}
-  \src{CA Secretary of State Statement of Vote, November 2022. YES / (YES + NO) per county. Prop 30 proposed a wealth surtax to fund EV infrastructure and wildfire prevention.}
+  \vspace{-0.4em}
+  \src{CA Secretary of State Statement of Vote, November 2022. YES / (YES + NO) per county.}
 \end{frame}
 
 \begin{frame}{A11: Prop 68 YES Share (2018, Environmental Bonds)}
   \begin{center}
     \IfFileExists{../output/figures/map_prop68_yes_share.png}{%
-      \includegraphics[width=0.80\textwidth]{../output/figures/map_prop68_yes_share.png}
+      \includegraphics[height=0.76\textheight,keepaspectratio]{../output/figures/map_prop68_yes_share.png}
     }{%
       \missingfig{map\_prop68\_yes\_share.png}
     }
   \end{center}
-  \src{CA Secretary of State Statement of Vote, June 2018 Primary. YES / (YES + NO) per county. Prop 68 authorized \$4B in bonds for parks, environmental protection, and water projects.}
+  \vspace{-0.4em}
+  \src{CA Secretary of State Statement of Vote, June 2018 Primary. YES / (YES + NO) per county.}
 \end{frame}
 
-\begin{frame}{A12: Placebo Check — Light Truck Event Study}
+% event_study_fd_truck_placebo.png: 2967x1878, ratio 1.58 (landscape)
+\begin{frame}{A12: Placebo Check --- Light Truck First-Difference Event Study}
   \begin{center}
-    \includegraphics[width=0.82\textwidth]{../output/figures/event_study_truck_placebo.png}
+    \includegraphics[width=0.84\textwidth,height=0.70\textheight,keepaspectratio]{../output/figures/event_study_fd_truck_placebo.png}
   \end{center}
   \vspace{-0.4em}
-  \src{Ideology $\times$ year coefficients for light trucks (green, dashed) vs.\ non-Tesla BEVs (blue).
-  A rising truck line post-2022 would indicate climate-conscious communities shifting away from EVs broadly. The monotone truck decline (2019--2022) is distinct from both EV series and consistent with the truck boom being a low-ideology phenomenon.}
+  \src{Ideology $\times$ year coefficients for $\Delta\log(\text{light truck}+1)$ (green) vs.\
+  $\Delta\log(\text{non-Tesla BEV}+1)$ (blue). Both tract- and county-clustered CIs shown.
+  The truck pattern is distinct from the EV series and consistent with truck adoption
+  being concentrated in lower-ideology communities.}
 \end{frame}
 
 \end{document}

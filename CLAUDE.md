@@ -201,7 +201,7 @@ hummers_or_hybrids_replication/
 
 ---
 
-## Project Status (updated 2026-02-25)
+## Project Status (updated 2026-02-28)
 
 **The full analysis pipeline is complete.** All scripts 01–11 have been written and run successfully. The paper draft (`paper/draft.md`) contains rendered results tables and references generated figures.
 
@@ -219,23 +219,25 @@ hummers_or_hybrids_replication/
 | `10_robustness.py` | R1/R2/R3 robustness tables; main results hold across all ideology specs | Complete |
 | `11_spatial.py` | Moran's I = 0.58 (transit), 0.41 (drive-alone); SAR ρ = 0.78 / 0.57; results survive | Complete |
 | `paper/draft.md` | Full Substack draft with rendered tables and figure references | Complete |
+| `paper/draft_revised.md` | Author reply to peer review; FD event study discussion | Complete (John) |
+| `paper/slides.tex` | Beamer deck rebuilt 2026-02-28; all major frame overflows fixed | Complete |
 
 **Open items / known gaps:**
 1. `data/raw/afdc/` is empty — EV charger density was never acquired; omitted from all models as a control
 2. Time-varying ACS controls (2019 vintage for early panel years) deferred; noted in Technical Appendix
 3. GitHub repo link placeholder remains in `paper/draft.md` — fill before publishing
 4. 2025 CEC data not yet available; would provide a stronger Elon Effect test (DOGE/Trump events only appear at tail of 2024 panel)
-5. `paper/slides.tex` — several frames have figures or tables that overflow the slide boundary; layout needs fixing before the deck is presentation-ready (see backlog item B1 below)
 
-**Backlog for John's Claude (priority order):**
+**Backlog (priority order):**
 
-**B1 — Fix Beamer slide overflow (`paper/slides.tex`)**
-Multiple frames contain figures or regression tables that are too large for the slide area, causing content to spill off-page or be clipped. When you open this file, audit every frame and fix overflow issues using one or more of the following approaches:
-- Scale figures with `\includegraphics[width=\textwidth]{...}` or `height=0.7\textheight` constraints
-- Wrap tables in `\resizebox{\textwidth}{!}{...}` or use `\small`/`\footnotesize` font size reduction
-- Split dense frames across two slides using `\framebreak` (requires `allowframebreaks` option) or manual duplication
-- Move secondary tables to appendix frames if they are not essential to the main narrative
-After fixing, recompile with `tectonic slides.tex` from the `paper/` directory and verify the PDF visually before committing.
+**B1 — Beamer slide overflow** ✅ **COMPLETE (2026-02-28)**
+Slides completely rebuilt with:
+- `[plain,noframenumbering]` title frame (removes empty nav pill)
+- 3 executive summary slides: Project Motivation, How AI Was Used, Key Findings
+- All CA maps height-constrained (`height=0.76\textheight,keepaspectratio`)
+- FD event study frames added (Scripts 09 & 09b)
+- All major overflows fixed: vbox reductions from 46pt/33pt/30pt → < 7pt
+- Remaining warnings: only trivial (< 7pt) or cosmetic (Kahn table hbox, pre-scale)
 
 **B2 — Address stock vs. flow critique (`paper/draft_revised.md`)** ⚠️ CONFIRMED ISSUE
 
