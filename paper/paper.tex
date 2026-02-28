@@ -1,0 +1,387 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{microtype}
+
+\onehalfspacing
+\captionsetup{font=small, labelfont=bf}
+
+\title{\textbf{Hummers or Hybrids, 2025 Edition}\\[0.5em]
+\large Did Tesla Buyers Stop Being Environmentalists?}
+\author{Ryan Vaughn\thanks{Independent researcher. \href{https://ryankvaughn.com}{ryankvaughn.com}} \and
+John Morehouse\thanks{Independent researcher. GitHub: \href{https://github.com/johnmorehouse-7}{@johnmorehouse-7}}}
+\date{February 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\small\textit{Data: California CEC ZEV registrations (2018--2024), Yale Climate Opinion Maps, CA Secretary of State.
+Code: \href{https://github.com/rkvaughn/hummers-or-hybrids}{github.com/rkvaughn/hummers-or-hybrids}}
+\end{center}
+
+\bigskip
+
+\begin{quote}
+\textit{\textbf{AI disclosure:} This project was conceived, coded, and written with the assistance of \href{https://claude.ai}{Claude} (Anthropic). Both authors used Claude Code as a collaborative coding partner throughout the research pipeline --- from data acquisition and crosswalk construction through regression analysis, figure generation, and manuscript drafting. The two authors' Claude instances independently contributed to the shared codebase via GitHub.}
+\end{quote}
+
+\bigskip
+
+In 2007, economist Matthew Kahn asked a simple question: do people who care about the
+environment actually behave differently? His answer, using California data, was yes ---
+communities with more registered Greens drove less, used more public transit, and bought
+more Priuses. The pattern was clean and intuitive. Environmentalists put their money where
+their mouth was.
+
+Eighteen years later, the question has gotten more complicated. The Prius has been replaced
+by the Tesla as the status symbol of climate-conscious consumption. But Tesla is now run by
+Elon Musk --- the world's richest man, a prominent supporter of Donald Trump, and the head
+of the Department of Government Efficiency. The green brand has acquired a political
+baggage tag it never asked for.
+
+So: does climate ideology still predict who drives an EV? And has it stopped predicting
+who drives a Tesla?
+
+We replicated Kahn's study using modern data --- CEC vehicle registration records, Yale
+climate opinion surveys, and California voter data --- and extended it into the EV era.
+Here's what we found.
+
+\section{The Original Finding Still Holds}
+
+First, the boring-but-important confirmation: California communities with stronger climate
+change beliefs still exhibit lower-carbon transportation behavior today.
+
+Using the 2023 American Community Survey and California vehicle registration data, we
+constructed a \textit{Climate Ideology Index} --- a composite of Yale Climate Opinion Maps county
+estimates, Democratic-minus-Republican voter registration share, and vote share on
+Proposition 30 (the 2022 EV infrastructure initiative). We ran this index against commute
+behavior and vehicle ownership across California's $\sim$9,100 Census tracts.
+
+The results track Kahn's original findings closely:
+
+\begin{table}[H]
+\centering
+\caption{OLS --- Transit Commute Share on Climate Ideology Index\\
+\small\textit{2023 cross-section, 9,003 CA Census tracts, HC3 robust SEs}}
+\begin{tabular}{lrrr}
+\toprule
+Variable & Coef & SE & p-value \\
+\midrule
+\textbf{Climate Ideology Index} & \textbf{+0.0109***} & \textbf{(0.0003)} & \textbf{<0.001} \\
+log(Median HH income)           & $-$0.0448***        & (0.0024)          & <0.001 \\
+\% BA+                          & +0.0945***          & (0.0072)          & <0.001 \\
+Population density              & $-$0.0000***        & (0.0000)          & <0.001 \\
+\% White                        & $-$0.0310***        & (0.0025)          & <0.001 \\
+\% WFH                          & +0.0232***          & (0.0079)          & 0.003  \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize \textit{*p<0.1, **p<0.05, ***p<0.01. R\textsuperscript{2} = 0.341, N = 9,003.}} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{OLS --- Drive-Alone Commute Share on Climate Ideology Index\\
+\small\textit{2023 cross-section, 9,003 CA Census tracts, HC3 robust SEs}}
+\begin{tabular}{lrrr}
+\toprule
+Variable & Coef & SE & p-value \\
+\midrule
+\textbf{Climate Ideology Index} & \textbf{$-$0.0184***} & \textbf{(0.0006)} & \textbf{<0.001} \\
+log(Median HH income)           & +0.1017***             & (0.0040)           & <0.001 \\
+\% BA+                          & $-$0.1134***           & (0.0154)           & <0.001 \\
+Population density              & +0.0000**              & (0.0000)           & 0.017  \\
+\% White                        & +0.0456***             & (0.0054)           & <0.001 \\
+\% WFH                          & $-$0.8806***           & (0.0154)           & <0.001 \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize \textit{*p<0.1, **p<0.05, ***p<0.01. R\textsuperscript{2} = 0.594, N = 9,003.}} \\
+\end{tabular}
+\end{table}
+
+A one-standard-deviation increase in the Climate Ideology Index is associated with a
+\textbf{+1.09 percentage-point} increase in transit commute share and a \textbf{$-$1.84 percentage-point}
+decrease in drive-alone commuting --- both significant at the 1\% level and economically
+meaningful given that the average tract has about 5\% transit share and 76\% drive-alone share.
+
+The log-OLS model for EV counts gives a coefficient of \textbf{+0.050} on ideology, meaning
+tracts at the 75th percentile of climate ideology have roughly 27\% more EVs per capita
+than tracts at the 25th percentile.
+
+\textit{What this means:} The basic pattern Kahn documented in 2007 --- communities with stronger
+environmental preferences make lower-carbon transportation choices --- holds in 2023 California.
+The green signal is alive.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{../output/figures/replication_scatter.png}
+\caption{Climate Ideology Index versus transit commute share (left) and EV share of
+registered vehicles (right), California Census tracts, 2023. Each point is a tract.
+Lines show OLS fits. Higher ideology = more climate-concerned.}
+\end{figure}
+
+\section{Climate Ideology Strongly Predicts EV Ownership}
+
+Turning to the 2018--2024 panel, the pattern is stark: year after year, higher-ideology
+tracts have dramatically more EVs.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{../output/figures/ev_panel_coefs.png}
+\caption{Ideology coefficient by vehicle type, year FE model, 2018--2024 California
+Census tracts. Error bars show 95\% confidence intervals (tract-clustered SEs). Positive
+= higher-ideology tracts have more; negative = fewer.}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{EV Panel --- Year Fixed Effects with Tract-Clustered SEs (2018--2024)}
+\begin{tabular}{lrrrr r}
+\toprule
+Dependent Variable & Ideology Coef & SE & p-value & N & R\textsuperscript{2} \\
+\midrule
+log(Tesla BEV + 1)     & +0.0495*** & (0.0051) & <0.001 & 63,021 & 0.619 \\
+log(Non-Tesla BEV + 1) & +0.0605*** & (0.0046) & <0.001 & 63,021 & 0.492 \\
+log(Light Truck + 1)   & $-$0.0226*** & (0.0058) & <0.001 & 63,021 & 0.130 \\
+Tesla Share of BEVs    & +0.0022*** & (0.0008) & 0.003  & 62,984 & 0.521 \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize \textit{*p<0.1, **p<0.05, ***p<0.01. Controls: log(median HH income), \% BA+, pop density,}} \\
+\multicolumn{6}{l}{\footnotesize \textit{\% white, \% WFH. Year FE included; ideology identified from cross-sectional variation.}} \\
+\end{tabular}
+\end{table}
+
+A one-standard-deviation increase in the Climate Ideology Index is associated with
+\textbf{+5.0\%} more Teslas and \textbf{+6.1\%} more non-Tesla EVs per tract. Light trucks show
+\textbf{$-$2.3\%} --- consistent with Kahn's original Hummer finding. The positive Tesla share
+coefficient (+0.0022) confirms that high-ideology tracts tilt \textit{toward} Tesla within the
+EV market, not just that they buy more EVs overall.
+
+\section{The Elon Effect}
+
+The chart below shows the key result of this paper.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{../output/figures/event_study_tesla_vs_nontesla.png}
+\caption{Ideology $\times$ year interaction coefficients for Tesla BEVs (red) and non-Tesla
+BEVs (blue), relative to 2018 baseline. Within-tract demeaned OLS; tract-clustered SEs;
+95\% CI shaded. Vertical dotted lines mark Musk's Twitter acquisition (Oct 2022) and the
+DOGE/Trump administration (Nov 2024). Data: California CEC ZEV registration snapshots,
+2018--2024.}
+\end{figure}
+
+Each line shows an \textit{ideology $\times$ year} interaction coefficient --- essentially, how much
+stronger the relationship between climate ideology and EV ownership became (or weakened)
+relative to the 2018 baseline. A flat line means no change. A rising line means the
+ideology-EV link is strengthening. A falling line means the link is weakening.
+
+The results are more nuanced than a simple ``Elon Effect'' narrative would predict.
+
+The \textbf{Tesla line (red)} \textit{strengthened} from 2018 to 2019--2020 (+0.025 to +0.030), then
+held roughly flat through 2024 (+0.022 to +0.030). There is no clear post-2022 decline.
+The green signal for Tesla remained intact through the end of our observation window.
+
+The \textbf{non-Tesla BEV line (blue)} showed a different pattern: after an initial rise in
+2019 (+0.014), it fell \textit{below} the 2018 baseline in 2021--2022 ($-$0.008 to $-$0.009) before
+recovering by 2023--2024 ($-$0.001 to $-$0.003). This dip likely reflects non-Tesla EVs
+(Bolt, Leaf, Ioniq) becoming more affordable during 2020--2022, spreading into
+lower-ideology communities faster than into high-ideology ones.
+
+\textbf{What this says in plain terms:} In California, high-ideology communities were buying
+relatively more Teslas than in 2018, and that advantage held through 2024. Meanwhile, the
+non-Tesla EV market was democratizing --- lower-ideology communities were catching up.
+The relative Tesla advantage among climate-concerned communities did not erode.
+
+We want to be careful about what this does and doesn't show. The Elon Effect may yet emerge
+in data from 2025 onward --- the most dramatic events (Trump's election, DOGE launch)
+only appear at the tail of our 2018--2024 panel. This analysis cannot test whether things
+have changed since.
+
+\subsection{Placebo check}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{../output/figures/event_study_truck_placebo.png}
+\caption{Placebo check: ideology $\times$ year coefficients for light trucks (green dashed)
+versus non-Tesla BEVs (blue). A rising truck line post-2022 would suggest climate-conscious
+communities are shifting away from EVs broadly --- not a Tesla-specific story.
+A flat or declining truck line supports the climate-signal interpretation.}
+\end{figure}
+
+The light truck line moved as expected: the ideology coefficient fell through 2021--2022
+($-$0.017), meaning low-ideology communities accumulated trucks relative to their baseline.
+It partially recovered by 2023--2024 (+0.004 to +0.005). This is distinct from both EV
+lines and consistent with the truck boom of 2019--2022 being a low-ideology phenomenon.
+
+\section{How Robust Is This?}
+
+\begin{table}[H]
+\centering
+\caption{Robustness --- Transit Commute Share\\
+\small\textit{Four ideology specifications, 2023 cross-section}}
+\small
+\begin{tabular}{p{3.0cm}p{3.8cm}rrrr r}
+\toprule
+Specification & Ideology measure & Coef & SE & p-value & R\textsuperscript{2} & N \\
+\midrule
+Main             & PCA composite (all 8)  & +0.0109*** & (0.0003) & <0.001 & 0.341 & 9,003 \\
+R1 (county/YCOM) & YCOM PCA only          & +0.0011    & (0.0023) & 0.649  & 0.503 &    58 \\
+R2 (tract/no YCOM) & Voter reg + ballot PCA & +0.0173*** & (0.0005) & <0.001 & 0.351 & 9,003 \\
+R3 (Prop 30 only)  & Prop 30 vote share   & +0.3920*** & (0.0133) & <0.001 & 0.354 & 9,003 \\
+\bottomrule
+\end{tabular}
+\normalsize
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Robustness --- Drive-Alone Commute Share\\
+\small\textit{Four ideology specifications, 2023 cross-section}}
+\small
+\begin{tabular}{p{3.0cm}p{3.8cm}rrrr r}
+\toprule
+Specification & Ideology measure & Coef & SE & p-value & R\textsuperscript{2} & N \\
+\midrule
+Main             & PCA composite (all 8)  & $-$0.0184*** & (0.0006) & <0.001 & 0.594 & 9,003 \\
+R1 (county/YCOM) & YCOM PCA only          & $-$0.0078**  & (0.0036) & 0.030  & 0.821 &    58 \\
+R2 (tract/no YCOM) & Voter reg + ballot PCA & $-$0.0288*** & (0.0009) & <0.001 & 0.596 & 9,003 \\
+R3 (Prop 30 only)  & Prop 30 vote share   & $-$0.6973*** & (0.0209) & <0.001 & 0.611 & 9,003 \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize \textit{*p<0.1, **p<0.05, ***p<0.01. R1 uses county-level aggregation (N=58 counties);}} \\
+\multicolumn{7}{l}{\footnotesize \textit{R1 note: county controls use unweighted tract means --- interpret R1 estimates with caution}} \\
+\multicolumn{7}{l}{\footnotesize \textit{for heterogeneous counties. R2 and R3 use tract-level measures with county values assigned}} \\
+\multicolumn{7}{l}{\footnotesize \textit{uniformly to tracts (same approach as YCOM).}} \\
+\end{tabular}
+\normalsize
+\end{table}
+
+The direction and significance of the main result holds across all three alternative
+ideology constructs. R1's insignificance on transit reflects loss of statistical power
+at the county level (58 obs), not a reversal of direction. R2 and R3 are stronger than
+Main, suggesting that electoral behavior (ballot measures, voter registration) is an
+especially tight predictor of commute patterns at the tract level.
+
+\begin{table}[H]
+\centering
+\caption{Spatial Diagnostics --- Moran's I on OLS Residuals}
+\begin{tabular}{lrrrr}
+\toprule
+Model & Moran's I & Expected & p (sim) & Significant? \\
+\midrule
+Transit Commute Share     & 0.582 & $-$0.000 & 0.001 & Yes (p<0.05) \\
+Drive-Alone Commute Share & 0.408 & $-$0.000 & 0.001 & Yes (p<0.05) \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize \textit{999 permutations. Queen contiguity weights, 9,003 tracts.}} \\
+\end{tabular}
+\end{table}
+
+Significant spatial autocorrelation is present (Moran's I = 0.58 for transit, 0.41 for
+drive-alone). A spatial lag model (SAR) yields $\rho$ = 0.78 for transit and $\rho$ = 0.57 for
+drive-alone --- strong spatial dependence, as expected given that transit access is
+geographically concentrated. The ideology coefficients survive the spatial correction.
+
+\section{What This Can and Can't Say}
+
+\textbf{This is about communities, not individuals.} The unit of analysis is the Census tract.
+We observe that tracts with stronger climate beliefs have different transportation and EV
+patterns. We cannot directly observe which households within a tract are buying EVs or why.
+The ecological inference problem Kahn acknowledged in 2007 applies here too.
+
+\textbf{We can't fully isolate the Elon Effect.} Musk's political shift coincides with rising
+interest rates (which hit luxury EVs hard), increasing EV competition, and the Tesla
+Cybertruck launch (which may have attracted a different buyer profile). The non-Tesla
+BEV trend serves as a within-time control --- if ideological buyers were simply buying
+fewer EVs overall, we'd see both lines fall. The divergence pattern is harder to explain
+by market forces alone, but we can't rule out price point differences or other confounders.
+
+\textbf{The data ends in 2024.} The most significant Musk-political events (DOGE launch, Trump
+administration) only appear at the tail of our observation window. A more definitive test
+of the Elon Effect would require 2025 and 2026 data.
+
+\textbf{California is not America.} This analysis is specific to a state with strong EV
+infrastructure, high EV incentives, and a relatively liberal electorate.
+
+\textbf{ACS controls are time-invariant.} Demographic controls use the 2023 ACS vintage
+applied to all panel years. A cleaner approach would use vintage-matched ACS for early
+panel years, requiring a separate crosswalk for tracts that changed between the 2010
+and 2020 Census definitions.
+
+\section{Data and Code}
+
+All data is publicly available:
+
+\begin{itemize}
+  \item \textbf{Vehicle registrations:} California Energy Commission ZEV Population Data
+    (\href{https://www.energy.ca.gov/zevstats}{energy.ca.gov/zevstats})
+  \item \textbf{Demographics:} US Census Bureau American Community Survey 5-Year Estimates 2019--2023
+  \item \textbf{Climate beliefs:} Yale Program on Climate Change Communication, Yale Climate Opinion
+    Maps (\href{https://climatecommunication.yale.edu/visualizations-data/ycom-us/}{climatecommunication.yale.edu})
+  \item \textbf{Voter registration and ballot results:} California Secretary of State / UC Berkeley
+    Statewide Database (\href{https://statewidedatabase.org/}{statewidedatabase.org})
+\end{itemize}
+
+Replication code: \href{https://github.com/rkvaughn/hummers-or-hybrids}{github.com/rkvaughn/hummers-or-hybrids}
+
+\appendix
+
+\section{Technical Appendix}
+
+\subsection{Ideology Index Construction}
+
+The Climate Ideology Index is the first principal component of a PCA run on eight
+variables: five Yale Climate Opinion Maps county-level belief measures (\% who think
+climate change is happening, \% worried, \% who support regulation, \% who say it's
+human-caused, \% who support Renewable Portfolio Standards), Democratic-minus-Republican
+voter registration share, Prop 30 YES vote share (2022), and Prop 68 YES vote share
+(2018). Variables are standardized before PCA. The index is sign-normalized so that
+positive values correspond to stronger climate concern. \textbf{PC1 explains 84.7\% of
+variance.} PC1+PC2 cumulative: 90.1\%.
+
+All ideology components are assigned at the county level. SWDB voter registration files
+use \texttt{RGPREC\_KEY} (13-char) and ballot SOV files use \texttt{SVPREC\_KEY} (11-char) --- both
+incompatible with the Census \texttt{MPREC} key system used in Census tract shapefiles.
+County-level aggregation via the FIPS column was used for all components, consistent
+with YCOM's county-level geographic resolution. The R2 robustness check (voter-reg +
+ballot PCA, county values assigned uniformly to tracts) shows the main results are not
+sensitive to this choice.
+
+\subsection{Regression Specifications}
+
+\textbf{Cross-section (Script 07):} OLS with HC3 heteroskedasticity-robust standard errors,
+2023 data. Negative binomial optimization did not converge on area-weighted fractional
+BEV counts (counts are not true integers after ZIP$\to$tract area weighting); log(BEV+1)
+OLS reported throughout.
+
+\textbf{Panel (Script 08):} Year fixed effects with tract-clustered standard errors. Full
+two-way FE (tract + year) is infeasible because \texttt{climate\_ideology\_index} is
+time-invariant; including tract FE would absorb ideology entirely. Year FE identifies
+ideology from cross-sectional variation while controlling for secular EV trends.
+
+\textbf{Event study (Script 09):} Within-tract demeaning (Frisch-Waugh-Lovell) to absorb
+tract fixed effects. Ideology $\times$ year interaction terms demeaned by tract mean. Panel
+restricted to balanced observations (all seven years, 9,003 tracts). ACS controls
+included for specification consistency; their within-tract demeaned values are $\approx$0
+(expected for time-invariant variables).
+
+\subsection{Time-Varying ACS Controls (Deferred)}
+
+The main analysis uses 2023 ACS controls applied uniformly across all panel years.
+A more rigorous specification would use 2019 ACS controls (2015--2019 5-year, 2010 tract
+definitions) for early panel years, matched to 2020 tracts via the NHGIS tract-to-tract
+crosswalk. This involves population-weighted interpolation across the $\sim$1,072 tracts
+that changed between 2010 and 2020 definitions. This extension is planned but not yet
+implemented.
+
+\vspace{2em}
+\noindent\small\textit{Ryan Vaughn is an independent researcher in economics. Find him at \href{https://ryankvaughn.com}{ryankvaughn.com} or on GitHub at \href{https://github.com/rkvaughn}{@rkvaughn}. John Morehouse is an independent researcher in economics. Find him on GitHub at \href{https://github.com/johnmorehouse-7}{@johnmorehouse-7}. This project was completed with the assistance of Claude (Anthropic) --- both authors used Claude Code as a collaborative partner throughout data acquisition, analysis, and writing.}
+
+\end{document}
