@@ -255,6 +255,18 @@ After fixing, recompile with `tectonic slides.tex` from the `paper/` directory a
 
 ---
 
+## Data Integrity — No Fabricated Quantitative Values
+
+**Full rule is in `~/Projects/CLAUDE.md`. This section adds project-specific enforcement.**
+
+Claude must never generate, hardcode, or invent any quantitative value — including numbers, thresholds, arrays, vectors, matrices, ideology scores, vote shares, EV counts, or classification cutoffs — unless it is read from an existing project data file, derived from one by documented computation, a universally-known constant, or a value pre-specified in the research design and explicitly confirmed by the PI.
+
+**Critical for this project:** Do not construct or impute ideology index values, climate belief scores, or political registration shares for any geographic unit before the underlying source files (YCOM, CA SoS voter registration, statement of vote CSVs, CEC ZEV data) have been downloaded and verified. Do not create placeholder panels or example regression outputs with invented coefficients.
+
+Any threshold, PCA component weight, ideology index scaling decision, or event-study parameter not directly output by a script reading project data files requires the confirmation protocol in `~/Projects/CLAUDE.md`.
+
+---
+
 ## Shared Utilities
 
 The `scripts/02_acquire_acs.py` and `scripts/04_crosswalk.py` scripts in this
