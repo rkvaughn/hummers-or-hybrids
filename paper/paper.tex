@@ -259,6 +259,43 @@ lines and consistent with the truck boom of 2019--2022 being a low-ideology phen
 
 \section{How Robust Is This?}
 
+Our composite Climate Ideology Index has a structural limitation worth being honest about:
+all eight input variables --- the five Yale Climate Opinion Maps belief measures, Democratic
+minus Republican voter registration share, and the two ballot measure vote shares --- ended
+up measured at the \textit{county} level. The SWDB precinct shapefiles use a different
+identifier key than Census MPREC, so precinct-level data could not be crosswalked to
+tracts; county-level values were assigned uniformly to every tract within a county. This
+means that every tract in San Francisco County gets the same ideology score, every tract in
+Kern County gets the same ideology score, and so on. If within-county variation in ideology
+is large, the uniformity assumption could bias our estimates.
+
+We check robustness with three alternative specifications designed to probe different
+dimensions of this concern.
+
+\textbf{R1 (county-level, YCOM only)} takes the cleanest possible approach to ideology
+measurement: it drops the analysis to the county level (N$\,$=$\,$58) and uses only the
+Yale Climate Opinion Maps survey data directly --- no crosswalk, no uniformity assumption.
+This sacrifices geographic precision for measurement quality. If the result holds at the
+county level with clean survey data, the tract-level uniformity assumption in the main
+spec is not driving the finding.
+
+\textbf{R2 (tract-level, no YCOM)} keeps all 9,003 tracts as the unit of analysis but
+removes the survey-based YCOM measures entirely. Ideology is built from revealed political
+behavior only: Democratic minus Republican voter registration share and the combined ballot
+measure vote shares for Prop 30 (2022) and Prop 68 (2018). Because these too were
+crosswalked at the county level, the ideology predictor still varies only across counties,
+not within them --- but the dependent variable (transit or drive-alone share) continues to
+vary at the tract level. R2 tests whether the finding holds when ideology is measured
+from electoral choices rather than stated survey beliefs, which some researchers consider
+a more reliable behavioral measure.
+
+\textbf{R3 (Prop 30 vote share alone)} is the simplest possible specification: a single
+predictor, directly climate-relevant. Proposition 30 (November 2022) proposed taxing
+incomes above \$2 million to fund electric vehicle infrastructure and wildfire prevention.
+Its supporters are, almost by definition, climate-conscious. If Prop 30 support predicts
+transit use and EV ownership, the ideology channel is real. If it doesn't, the main result
+might be driven by broader political alignment rather than climate-specific attitudes.
+
 \begin{table}[H]
 \centering
 \caption{Robustness --- Transit Commute Share\\
@@ -300,10 +337,19 @@ R3 (Prop 30 only)  & Prop 30 vote share   & $-$0.6973*** & (0.0209) & <0.001 & 0
 \end{table}
 
 The direction and significance of the main result holds across all three alternative
-ideology constructs. R1's insignificance on transit reflects loss of statistical power
-at the county level (58 obs), not a reversal of direction. R2 and R3 are stronger than
-Main, suggesting that electoral behavior (ballot measures, voter registration) is an
-especially tight predictor of commute patterns at the tract level.
+ideology constructs. R1 is statistically insignificant on transit --- but with only 58
+observations (counties), the standard error is roughly seven times wider than in the
+main spec. The point estimate is in the right direction; the county-level analysis simply
+lacks power. R2 and R3 are actually \textit{stronger} than the main specification,
+suggesting that revealed electoral behavior is an especially tight predictor of commute
+patterns at the tract level --- possibly because Prop 30 and voter registration are measured
+in the same geographic era as the 2023 ACS commute data.
+
+\textbf{Spatial robustness.} A separate concern is that neighboring Census tracts
+tend to look alike --- in ideology, in transit access, in demographics. If the error terms
+in our regressions are correlated across space, our standard errors will be too small and
+we may over-reject the null. Moran's I is a standard test for this: it measures whether
+the OLS residuals cluster spatially more than random chance would predict.
 
 \begin{table}[H]
 \centering
@@ -319,10 +365,20 @@ Drive-Alone Commute Share & 0.408 & $-$0.000 & 0.001 & Yes (p<0.05) \\
 \end{tabular}
 \end{table}
 
-Significant spatial autocorrelation is present (Moran's I = 0.58 for transit, 0.41 for
-drive-alone). A spatial lag model (SAR) yields $\rho$ = 0.78 for transit and $\rho$ = 0.57 for
-drive-alone --- strong spatial dependence, as expected given that transit access is
-geographically concentrated. The ideology coefficients survive the spatial correction.
+Significant spatial autocorrelation is present in both outcomes (Moran's I = 0.58 for
+transit, 0.41 for drive-alone; both p$<$0.001). This confirms that neighboring tracts
+look alike in ways not fully captured by our controls --- not surprising, since a subway
+line or bus route serves contiguous neighborhoods by construction.
+
+To address this, we estimated a spatial lag model (SAR). The SAR augments the OLS
+regression with a spatially-weighted average of neighboring tracts' outcomes, effectively
+controlling for the local environment of each tract. The estimated spatial autoregression
+coefficient $\hat{\rho}$ = 0.78 for transit and 0.57 for drive-alone confirms strong
+spatial dependence. Crucially, the ideology coefficients survive the correction: the
+relationship between climate ideology and commuting behavior is not simply picking up
+the fact that ideologically similar communities cluster together geographically.
+Controlling for the neighborhood's commute behavior, ideology still predicts how you
+get to work.
 
 \section{What This Can and Can't Say}
 
