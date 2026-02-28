@@ -68,7 +68,17 @@ estimates, Democratic-minus-Republican voter registration share, and vote share 
 Proposition 30 (the 2022 EV infrastructure initiative). We ran this index against commute
 behavior and vehicle ownership across California's $\sim$9,100 Census tracts.
 
-The results track Kahn's original findings closely:
+The results track Kahn's original findings closely. For each outcome $y_i$ (transit share or
+drive-alone share for tract $i$), we estimate:
+
+\begin{equation}
+  y_i = \alpha + \beta \cdot \text{Ideology}_i + \mathbf{X}_i'\boldsymbol{\gamma} + \varepsilon_i
+  \label{eq:crosssection}
+\end{equation}
+
+where $\text{Ideology}_i$ is the standardized Climate Ideology Index and $\mathbf{X}_i$ contains
+log median household income, \% BA+, population density, \% white, and \% working from home.
+Standard errors are HC3 heteroskedasticity-robust. The coefficient of interest is $\hat{\beta}$:
 
 \begin{table}[H]
 \centering
@@ -132,7 +142,16 @@ Lines show OLS fits. Higher ideology = more climate-concerned.}
 \section{Climate Ideology Strongly Predicts EV Ownership}
 
 Turning to the 2018--2024 panel, the pattern is stark: year after year, higher-ideology
-tracts have dramatically more EVs.
+tracts have dramatically more EVs. The panel specification is:
+
+\begin{equation}
+  \log(\text{EV}_{it} + 1) = \beta \cdot \text{Ideology}_i + \mathbf{X}_i'\boldsymbol{\gamma} + \lambda_t + \varepsilon_{it}
+  \label{eq:panel}
+\end{equation}
+
+where $\lambda_t$ are year fixed effects (absorbing aggregate EV adoption trends),
+$\text{Ideology}_i$ is time-invariant (identified from cross-sectional variation),
+and standard errors are clustered at the tract level.
 
 \begin{figure}[H]
 \centering
@@ -178,6 +197,22 @@ BEVs (blue), relative to 2018 baseline. Within-tract demeaned OLS; tract-cluster
 DOGE/Trump administration (Nov 2024). Data: California CEC ZEV registration snapshots,
 2018--2024.}
 \end{figure}
+
+The event study estimates ideology's relationship with EV ownership separately for each year,
+using within-tract demeaning (Frisch-Waugh-Lovell) to absorb tract fixed effects:
+
+\begin{equation}
+  \widetilde{\log(\text{EV}_{it}+1)}
+    = \sum_{\tau \neq 2018} \beta_\tau \cdot \widetilde{(\text{Ideology}_i \times \mathbf{1}[t=\tau])}
+    + \widetilde{\mathbf{X}_i}'\boldsymbol{\gamma}
+    + \lambda_t
+    + \varepsilon_{it}
+  \label{eq:eventstudy}
+\end{equation}
+
+where tildes denote within-tract demeaning, $\mathbf{1}[t=\tau]$ is a year dummy,
+and 2018 is the omitted base year ($\beta_{2018} \equiv 0$). The coefficients
+$\{\hat{\beta}_\tau\}$ trace how the ideology--EV relationship evolves over time.
 
 Each line shows an \textit{ideology $\times$ year} interaction coefficient --- essentially, how much
 stronger the relationship between climate ideology and EV ownership became (or weakened)
@@ -346,6 +381,17 @@ voter registration share, Prop 30 YES vote share (2022), and Prop 68 YES vote sh
 positive values correspond to stronger climate concern. \textbf{PC1 explains 84.7\% of
 variance.} PC1+PC2 cumulative: 90.1\%.
 
+Formally, let $\mathbf{z}_{c} = (z_{c1}, \ldots, z_{c8})'$ be the vector of
+standardized ideology components for county $c$. The index is:
+
+\begin{equation}
+  \text{Ideology}_c = \mathbf{v}_1'\mathbf{z}_c
+  \label{eq:pca}
+\end{equation}
+
+where $\mathbf{v}_1$ is the first eigenvector of the sample covariance matrix of $\mathbf{z}$.
+For Census tract $i$ in county $c$, we assign $\text{Ideology}_i = \text{Ideology}_c$.
+
 All ideology components are assigned at the county level. SWDB voter registration files
 use \texttt{RGPREC\_KEY} (13-char) and ballot SOV files use \texttt{SVPREC\_KEY} (11-char) --- both
 incompatible with the Census \texttt{MPREC} key system used in Census tract shapefiles.
@@ -356,21 +402,43 @@ sensitive to this choice.
 
 \subsection{Regression Specifications}
 
-\textbf{Cross-section (Script 07):} OLS with HC3 heteroskedasticity-robust standard errors,
-2023 data. Negative binomial optimization did not converge on area-weighted fractional
-BEV counts (counts are not true integers after ZIP$\to$tract area weighting); log(BEV+1)
-OLS reported throughout.
+\textbf{Cross-section} (Equation~\ref{eq:crosssection}; Script 07): OLS with HC3
+heteroskedasticity-robust standard errors, 2023 data, $N = 9{,}003$ tracts.
+The dependent variable vector $\mathbf{y}$ includes transit commute share,
+drive-alone commute share, and $\log(\text{EV count}+1)$.
+Negative binomial optimization did not converge on area-weighted fractional BEV
+counts (counts are not true integers after ZIP$\to$tract area weighting);
+log-OLS is reported throughout.
 
-\textbf{Panel (Script 08):} Year fixed effects with tract-clustered standard errors. Full
-two-way FE (tract + year) is infeasible because \texttt{climate\_ideology\_index} is
+\textbf{Panel} (Equation~\ref{eq:panel}; Script 08): Year fixed effects with tract-clustered
+standard errors, $N = 63{,}021$ tract-year observations (9,003 tracts $\times$ 7 years).
+Full two-way FE (tract + year) is infeasible because $\text{Ideology}_i$ is
 time-invariant; including tract FE would absorb ideology entirely. Year FE identifies
-ideology from cross-sectional variation while controlling for secular EV trends.
+$\hat{\beta}$ from cross-sectional variation while controlling for secular EV adoption trends.
+The spatial lag model (SAR) replaces $\varepsilon_{it}$ with $\rho \mathbf{W}\mathbf{y} + \boldsymbol{\xi}$,
+where $\mathbf{W}$ is a row-standardized queen-contiguity weight matrix and $\rho$ is the
+estimated spatial autoregression coefficient.
 
-\textbf{Event study (Script 09):} Within-tract demeaning (Frisch-Waugh-Lovell) to absorb
-tract fixed effects. Ideology $\times$ year interaction terms demeaned by tract mean. Panel
-restricted to balanced observations (all seven years, 9,003 tracts). ACS controls
-included for specification consistency; their within-tract demeaned values are $\approx$0
-(expected for time-invariant variables).
+\textbf{Event study} (Equation~\ref{eq:eventstudy}; Script 09): Within-tract demeaning
+(Frisch-Waugh-Lovell) absorbs tract fixed effects without constructing $\sim$9,000 dummies.
+For any variable $w_{it}$, define $\tilde{w}_{it} = w_{it} - \bar{w}_i$ where
+$\bar{w}_i = T^{-1}\sum_t w_{it}$. The panel is restricted to balanced observations
+(all seven years, 9,003 tracts). ACS controls are time-invariant, so
+$\tilde{\mathbf{X}}_i \approx \mathbf{0}$; they are retained for specification consistency.
+
+\textbf{First-difference event study} (Script 09b): Addresses the stock vs.\ flow critique
+by replacing the level dependent variable with its first difference:
+
+\begin{equation}
+  \Delta\log(\text{EV}_{it}+1) \;=\; \log(\text{EV}_{it}+1) - \log(\text{EV}_{i,t-1}+1)
+  \label{eq:fd}
+\end{equation}
+
+The first-differenced outcome approximates the net annual change in registered vehicles
+(new purchases minus retirements and out-of-state transfers). Base year is 2019 (the
+first year for which a first difference is defined). The event study specification in
+Equation~\ref{eq:eventstudy} is then applied with $\Delta\log(\text{EV}_{it}+1)$ as the
+dependent variable and $\tau \neq 2019$ as the omitted base year.
 
 \subsection{Time-Varying ACS Controls (Deferred)}
 
