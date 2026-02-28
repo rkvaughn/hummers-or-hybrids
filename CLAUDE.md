@@ -255,6 +255,27 @@ After fixing, recompile with `tectonic slides.tex` from the `paper/` directory a
 
 ---
 
+## Shared Utilities
+
+The `scripts/02_acquire_acs.py` and `scripts/04_crosswalk.py` scripts in this
+project were the **original source** for the following reusable utility modules,
+now published at https://github.com/rkvaughn/python-geo-utils:
+
+| Utility | Originated from |
+|---------|----------------|
+| `census_api.py` | `scripts/02_acquire_acs.py` — Census API batch fetcher pattern |
+| `geo_crosswalk.py` | `scripts/04_crosswalk.py` — ZCTA→tract, county→tract, precinct→tract |
+| `download_utils.py` | `scripts/04_crosswalk.py` — `download_zip` helper |
+
+If you need to extend any crosswalk or Census API logic for future work on this
+project, check the canonical utilities repo first. If the canonical version
+doesn't cover the new case, update it there and note the change.
+
+**Do not rewrite these patterns inline** — the utility modules exist precisely
+to avoid diverging implementations across projects.
+
+---
+
 ## Instructions for Claude
 
 - Working directory: `~/Projects/hummers_or_hybrids_replication/`
